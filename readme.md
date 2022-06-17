@@ -1,7 +1,8 @@
 ### lua ecs sample
 ``` lua
--- test components
 
+require("xlib")
+-- test components
 local com_player = class(xlib.ecs.component)
 com_player.coin = 0;
 com_player.gem = 0;
