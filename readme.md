@@ -1,3 +1,4 @@
+### lua ecs sample
 -- test components
 
 local com_player = class(xlib.ecs.component)
