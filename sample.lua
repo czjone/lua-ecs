@@ -50,11 +50,23 @@ end
 
 --------------------------------------------------
 -- test case.
-xlib.test.new():put(function()
-    return true;
-end, "class"):put(function()
-    return true;
-end, "loger"):put(function()
+-- xlib.test.new():put(function()
+--     return true;
+-- end, "class"):put(function()
+--     return true;
+-- end, "loger"):put(function()
+--     local loop = 3 -- min = 1
+--     local feature = xlib.ecs.feature.new()
+--     feature:add(ui_system.new()):add(network_system.new())
+--     feature:initialize();
+--     for i = 1, loop, 1 do
+--         feature:execute()
+--     end
+--     feature:cleanup();
+--     return true;
+-- end, "ecs"):run()
+
+function main() 
     local loop = 3 -- min = 1
     local feature = xlib.ecs.feature.new()
     feature:add(ui_system.new()):add(network_system.new())
@@ -64,4 +76,4 @@ end, "loger"):put(function()
     end
     feature:cleanup();
     return true;
-end, "ecs"):run()
+end
