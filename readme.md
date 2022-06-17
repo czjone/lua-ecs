@@ -1,4 +1,5 @@
 ### lua ecs sample
+``` lua
 -- test components
 
 local com_player = class(xlib.ecs.component)
@@ -78,3 +79,4 @@ function main()
     feature:cleanup();
     return true;
 end
+```
