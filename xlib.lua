@@ -60,6 +60,22 @@ function table.indexof(_table, val)
     return -1, nil;
 end
 
+function table.remove_all_for_array(array)
+    for _, v in ipairs(array) do
+        table.remove(v)
+    end
+end
+
+function table.remove_item(_table, val)
+    local pos = -1;
+    for _pos, v in ipairs(_table) do
+        if v == val then
+            pos = _pos
+        end
+    end
+    table.remove(pos);
+end
+
 -- ==========================================================================
 -- xlib.core
 xlib.core = xlib.core or {}
@@ -209,151 +225,202 @@ end
 -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
 
-----------------------------------------------------------
--- xlib.ecs.base
-xlib.ecs.base = class(xlib.core.eventdispather)
-local ecsbase = xlib.ecs.base;
-function ecsbase:ctor(context)
-    self._context = context;
+xlib.ecs.context = class({})
+local context = xlib.ecs.context;
+
+function context:ctor(entity_type)
+    self._entites = {}
+    self._entity_type = entity_type;
 end
 
-function ecsbase:getcontext()
-    return self._context
+function context:create_entity()
+    local entity = self._entity_type.new();
+    table.insert(self._entites, entity);
+    return entity;
 end
 
-----------------------------------------------------------
--- xlib.ecs.entity
-xlib.ecs.entity = class(xlib.ecs.base)
+function context:create_collector(group_matchers, group_events)
+
+end
+
+function context:destroy_entity(entity)
+    table.remove_item(self._entites, entity);
+end
+
+function context:has_entity(entity)
+    local pos, val = table.indexof(entity)
+    return pos > 0
+end
+
+function context:get_entites()
+    return self._entites;
+end
+
+function context:get_group(matcher)
+end
+
+xlib.ecs.entity = class({})
 local entity = xlib.ecs.entity
-entity.event = {}
-entity.event.on_add_component = 1
-entity.event.on_remove_component = 2
-entity.event.on_replace_component = 3
-entity.event.on_release_entity = 4
-entity.event.on_destroy_entity = 5
-
-function entity:ctor()
-    self._coms = {}
-end
-
-function entity:dector()
-    self:dispatch(self.event.on_destroy_entity);
-    entity.super.dector(self)
-end
-
 function entity:add(com)
-    table.insert(self._coms, com);
-    self:dispatch(self.event.on_add_component, com);
-    return self;
 end
-
+function entity:remove(com)
+end
 function entity:replace(com)
-    local index, val = table.indexof(self._coms, com);
-    if val ~= com then
-        self._coms[index] = com;
-        self:dispatch(self.event.on_add_component, com);
-    end
-    return self;
 end
 
-------------------------------------------------------------
--- xlib.ecs.component
-xlib.ecs.component = class(xlib.ecs.base)
+xlib.ecs.component = class({})
 local component = xlib.ecs.component
-function component:ctor()
-    self._typeid = -1;
-end
-
-------------------------------------------------------------
--- xlib.ecs.componentPool
-xlib.ecs.component_pool = class(xlib.ecs.base)
-local component_pool = xlib.ecs.component_pool
-function component_pool:ctor()
-    self._pool = {}
-end
-
-function component_pool:put(component)
-    local pool = self._pool[component._typeid];
-    if pool == nil then
-        pool = {};
-        self._pool[component._typeid] = pool;
-    end
-    table.indexof(pool, component)
-    return self;
-end
-
-function component_pool:get(component)
-    local pool = self._pool[component._typeid];
-    if pool ~= nil and #pool > 0 then
-        local ret = pool[#pool];
-        table.remove(pool, #pool);
-        return ret;
-    end
-    return nil;
-end
-
-------------------------------------------------------------
--- xlib.ecs.system
-xlib.ecs.system = class(xlib.ecs.base)
-local system = xlib.ecs.system;
-
-function system:ctor(name)
-    self.name = name
-    self._inited = false
-    self._child_system = {}
-end
-
-function system:add(sys)
-    table.insert(self._child_system, sys)
-    return self;
-end
-
-function system:remove(sys)
-    local type = type(sys)
-    local is_table = type == "table"
-    local is_string = type == "string"
-    for i = #self._child_system, 1, -1 do
-        local _sys = self._child_system[i];
-        if (is_table and _sys == sys) or (is_string and _sys.name == sys.name) then
-            table.remove(self._child_system, i);
-        end
-    end
-end
-
-function system:initialize()
-    for _, sys in pairs(self._child_system) do
-        if not sys._inited then
-            sys:initialize();
-        end
-    end
-end
-
-function system:execute()
-    if not self._inited then
-        self:initialize();
-    end
-    for _, sys in pairs(self._child_system) do
-        sys:execute();
-    end
-end
-
-function system:cleanup()
-    for _, sys in pairs(self._child_system) do
-        sys:cleanup();
-    end
-    self._child_system = nil
+function component:ctor(t_id)
+    self.tid = t_id
 end
 
 xlib.ecs.matcher = class({})
+local matcher = xlib.ecs.matcher
+function matcher:ctor(entites,compare_func)
+    self._compare = compare_func
+    self._entites = entites;
+end
 
--- function system:filter()
---     return {};
--- end
+function matcher:get_entites()
+    local entites = self._entites
+    local compare = self._compare;
+    local match_entites = {}
+    for i, entity in ipairs(entites) do
+        if(compare()) then
+            table.insert(match_entites,entity)
+        end
+    end
+end
 
-------------------------------------------------------------
--- xlib.ecs.feature
-xlib.ecs.feature = class(xlib.ecs.system)
-local feature = xlib.ecs.feature
+xlib.ecs.system = class({})
+local system = xlib.ecs.system
+function system:ctor(name, context)
+    self.name = name;
+    self.context = context
+    self._systems = {}
+end
+
+function system:iniztion()
+    local systems = self._systems;
+    for _, system in ipairs(systems) do
+        system:initialize();
+    end
+end
+function system:execute()
+    local systems = self._systems;
+    for _, system in ipairs(systems) do
+        -- reactive_system _execute call execute.
+        local exec = system._execute or system.execute;
+        exec(system);
+    end
+end
+function system:activate()
+    local systems = self._systems;
+    for _, system in ipairs(systems) do
+        system:activate();
+    end
+end
+function system:deactivate()
+    local systems = self._systems;
+    for _, system in ipairs(systems) do
+        system:deactivate();
+    end
+end
+function system:clear()
+    table.remove_all_for_array(self._systems);
+end
+
+xlib.ecs.reactive_system = class({})
+local reactive_system = xlib.ecs.reactive_system
+
+function reactive_system:ctor(name, context)
+    self.name = name
+    self.context = context
+    self._execute_buf = {}
+    self._collector = self:get_collector();
+end
+
+function reactive_system:get_collector()
+    return context:create_collector({}, {});
+end
+
+function reactive_system:filter(entity)
+    return true;
+end
+
+function reactive_system:_execute()
+    local entities = self._execute_buf;
+    local collect_entities = self._collector:get_collected_entities();
+    for _, entity in ipairs(collect_entities) do
+        if (self:filter(entity)) then
+            table.insert(entities, entity)
+        end
+    end
+    self:execute(entities);
+    table.remove_all_for_array(entities);
+end
+function reactive_system:execute(entities)
+    error("not execute implements for reactive_system.");
+end
+function reactive_system:activate()
+    self._collector:activate();
+end
+function reactive_system:deactivate()
+    self._collector:deactivate();
+end
+function reactive_system:clear()
+    self._collector:clear();
+end
+
+xlib.ecs.group = class(xlib.core.eventdispather)
+local group = xlib.ecs.group
+
+group.event = group.event or {}
+group.event.on_entity_added = 1
+group.event.on_entity_removed = 2
+
+function group:has_entity(entity)
+end
+function group:get_entites()
+end
+
+xlib.ecs.collector = class({})
+local collector = xlib.ecs.collector;
+function collector:ctor(groups, group_events)
+    self._groups = groups;
+    self._group_events = group_events;
+    self._collectedEntities = {};
+end
+function collector:get_collected_entities()
+end
+function collector:activate(entities)
+    local groups = self._groups
+    for _, group in ipairs(groups) do
+        group:removelistener(group.event.on_entity_added, self._add_entity)
+        group:addeventlistener(group.event.on_entity_added, self._add_entity)
+    end
+end
+function collector:deactivate(entities)
+    local groups = self._groups
+    for _, group in ipairs(groups) do
+        group:removelistener(group.event.on_entity_added, self._add_entity)
+    end
+end
+function collector:clear()
+    table.remove_all(self._collectedEntities);
+end
+
+function collector:_add_entity(entity)
+    local pos, _ = table.indexof(self._collectedEntities, entity)
+    if (pos > 0) then
+        return
+    end
+    table.insert(self._collectedEntities, entity);
+end
+
+function collector:_remove_enity(entity)
+    table.remove_item(self._collectedEntities, entity);
+end
 
 -- -- ==========================================================================
 -- -- xlib.unity
