@@ -1,0 +1,22 @@
+[INFO]	===================================================
+[INFO]	      author:      	solyess
+[INFO]	      version:     	0.0.1
+[INFO]	      modify time: 	2020-06-21
+[INFO]	===================================================
+[INFO]	
+[INFO]	[class test]
+[ OK ]	d_instance.val == ret
+[ OK ]	c_instance.val == ret
+[INFO]	MEMORY LEAK:	109.375	 BYTES
+[INFO]	
+[INFO]	[memory test]
+[INFO]	MEMORY LEAK:	31.25	 BYTES
+[INFO]	
+[INFO]	[table extention test]
+[INFO]	MEMORY LEAK:	31.25	 BYTES
+[INFO]	
+[INFO]	++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[INFO]	total:   	3
+[INFO]	success: 	3
+[INFO]	fail:    	0
+[INFO]	++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

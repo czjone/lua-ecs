@@ -1,1 +1,1 @@
-@lua52 .\test\main.lua
+@lua52 .\test\main.lua >> test_result.log
