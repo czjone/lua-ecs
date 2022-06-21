@@ -1,0 +1,7 @@
+require("xlib.core.base")
+require("xlib.core.eventdispather")
+require("xlib.core.loger")
+require("xlib.core.memory")
+require("xlib.core.table")
+require("xlib.core.test")
+require("xlib.core.test_base")

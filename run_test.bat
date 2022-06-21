@@ -1,0 +1,1 @@
+@lua52 .\test\main.lua

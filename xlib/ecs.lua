@@ -1,0 +1,8 @@
+require("xlib.ecs.collector")
+require("xlib.ecs.component")
+require("xlib.ecs.context")
+require("xlib.ecs.entity")
+require("xlib.ecs.group")
+require("xlib.ecs.matcher")
+require("xlib.ecs.reactive_system")
+require("xlib.ecs.system")
