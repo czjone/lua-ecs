@@ -7,7 +7,7 @@ cd ./
 ```
 
 ### test result
-    [test_result.log](./test_result.log)
+[test_result.log](./test_result.log)
     
 ### lua  ecs sample
 ``` lua
