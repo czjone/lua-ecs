@@ -1,4 +1,11 @@
-### lua ecs sample
+# lua ecs framework
+
+### run test
+``` sh
+cd ./
+.\run_test.bat
+```
+### lua  ecs sample
 ``` lua
 
 require("xlib")
