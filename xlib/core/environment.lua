@@ -7,8 +7,6 @@ local suports = {
 }
 local lua_version = tostring(_VERSION);
 
-log:info(tostring(_VERSION))
-
 local is_support = false
 for _, v in ipairs(suports) do
     if(v == lua_version) then
@@ -16,5 +14,4 @@ for _, v in ipairs(suports) do
         break;
     end
 end
-
-log:assert(is_support, "lua env must 5.2 or later") 
+log:assert(is_support, "lua env must 5.2 or later,current runtime:"..lua_version) 

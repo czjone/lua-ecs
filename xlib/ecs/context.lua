@@ -5,12 +5,14 @@ xlib.ecs.context = class({})
 local context = xlib.ecs.context;
 
 function context:ctor(entity_type)
+    self._entites_pool = xlib.core.object_pool.new(entity_type);
     self._entites = {}
     self._entity_type = entity_type;
+    self._groups = {};
 end
 
 function context:create_entity()
-    local entity = self._entity_type.new();
+    local entity = self._entites_pool:get();
     table.insert(self._entites, entity);
     return entity;
 end
@@ -21,6 +23,7 @@ end
 
 function context:destroy_entity(entity)
     table.remove_item(self._entites, entity);
+    self._entites_pool:put(entity)
 end
 
 function context:has_entity(entity)

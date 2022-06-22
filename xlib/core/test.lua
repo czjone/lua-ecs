@@ -25,54 +25,52 @@ function test:put(test, name)
 end
 
 function test:_put_testor(test_instance)
-    table.insert(
-        self._test,
-        {
-            o = test_instance,
-            name = test_instance.name,
-            f = function()
-                return test_instance:execute()
-            end
-        }
-    )
+    table.insert(self._test, {
+        o = test_instance,
+        name = test_instance.name,
+        f = function()
+            return test_instance:execute()
+        end
+    })
     return self
 end
 
 function test:expect(out_val, tag_val, des)
     if (out_val ~= tag_val) then
         if des then
-            log:fail(des)
+            log:fail(des, " fail, expect value:", tag_val, "get value:", out_val)
             log:fail(debug.traceback())
         else
-            -- log:fail("  nil")
+            log:fail("fail,expect value:", tag_val, " get value:", out_val)
             log:fail(debug.traceback())
         end
         return false
     else
-        log:ok(des)
+        log:ok("tset", des)
         return true
     end
 end
 
-function test:expect_true(tag_val, des)
-    return self:expect(true, tag_val, des)
+function test:expect_true(out_val, des)
+    return self:expect(out_val, true, des)
 end
 
-function test:expect_false(tag_val, des)
-    return self:expect(false, tag_val, des)
+function test:expect_false(out_val, des)
+    return self:expect(out_val, false, des)
 end
 
 function test:run()
     log:info("===================================================")
     log:info("      author:      ", "solyess")
     log:info("      version:     ", xlib.version)
+    log:info("      Lua runtime: ", _VERSION)
     log:info("      modify time: ", "2020-06-21")
     log:info("===================================================")
 
     local memory = xlib.memory.new()
     local count, success, fail = #self._test, 0, 0
     for _, vt in ipairs(self._test) do
-        log:info("")
+        log:info("--------------------------------")
         log:info(string.format("[%s]", vt.name))
         if (not memory:monitor(vt.f, vt.name)) then
             log:fail("----- [" .. vt.name .. "] fail -----")

@@ -16,18 +16,15 @@ function class(super)
     class_type.super = super
     class_type.new = function(...)
         local obj = {}
-        setmetatable(
-            obj,
-            {
-                __index = class_type,
-                -- 5.2 or later.
-                __gc = function()
-                    if (obj.dector) then
-                        obj:dector()
-                    end
+        setmetatable(obj, {
+            __index = class_type,
+            -- 5.2 or later.
+            __gc = function()
+                if (obj.dector) then
+                    obj:dector()
                 end
-            }
-        )
+            end
+        })
         do
             local create = nil
             local callsuper = nil
@@ -44,15 +41,12 @@ function class(super)
         return obj
     end
     if super then
-        setmetatable(
-            class_type,
-            {
-                __index = function(t, k)
-                    local ret = super[k]
-                    return ret
-                end
-            }
-        )
+        setmetatable(class_type, {
+            __index = function(t, k)
+                local ret = super[k]
+                return ret
+            end
+        })
     end
     return class_type
 end
