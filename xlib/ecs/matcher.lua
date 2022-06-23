@@ -3,6 +3,7 @@
 xlib.ecs = xlib.ecs or {}
 xlib.ecs.matcher = class({})
 local matcher = xlib.ecs.matcher
+
 function matcher:ctor(entites, compare_func)
     self._compare = compare_func
     self._entites = entites

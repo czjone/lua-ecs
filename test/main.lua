@@ -14,7 +14,7 @@ test:put("test.ecs.component_test")
 -- test:put("test.ecs.reactive_system_test")
 -- test:put("test.ecs.group_test")
 -- test:put("test.ecs.collector_test")
--- -- ecs test
--- test:put("test.ecs.feature_test")
+-- ecs test
+test:put("test.ecs.system_example_test")
 
 test:run();

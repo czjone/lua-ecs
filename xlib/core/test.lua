@@ -46,7 +46,7 @@ function test:expect(out_val, tag_val, des)
         end
         return false
     else
-        log:ok("tset", des)
+        log:ok("test", des)
         return true
     end
 end

@@ -8,8 +8,10 @@ function collector:ctor(groups, group_events)
     self._group_events = group_events;
     self._collectedEntities = {};
 end
+
 function collector:get_collected_entities()
 end
+
 function collector:activate(entities)
     local groups = self._groups
     for _, group in ipairs(groups) do
@@ -17,12 +19,14 @@ function collector:activate(entities)
         group:addeventlistener(group.event.on_entity_added, self._add_entity)
     end
 end
+
 function collector:deactivate(entities)
     local groups = self._groups
     for _, group in ipairs(groups) do
         group:removelistener(group.event.on_entity_added, self._add_entity)
     end
 end
+
 function collector:clear()
     table.remove_all_for_array(self._collectedEntities);
 end

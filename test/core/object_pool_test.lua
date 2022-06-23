@@ -42,7 +42,7 @@ function object_pool_test:execute()
 
     function object_pool_handler:reconvery_object(obj)
         -- do sth.set parent to nil for unity.
-        log:info("---------------------------")
+        -- log:info("---------------------------")
         obj.is_free = true;
     end
 

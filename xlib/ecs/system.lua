@@ -1,13 +1,25 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
-xlib.ecs.system = class({})
+xlib.ecs.system = class(xlib.core.eventdispather)
 local system = xlib.ecs.system
 
 function system:ctor(name, context)
     self.name = name;
     self.context = context
     self._systems = {}
+    self._is_inited = false
+end
+
+function system:_set_status(status)
+    self._status = status;
+end
+
+function system:add_system(system)
+    if (self._is_inited == true) then
+        log:error("add system only befor parent system iniztioned.");
+    end
+    table.insert(self._systems, system);
 end
 
 function system:iniztion()
@@ -16,6 +28,7 @@ function system:iniztion()
         system:initialize();
     end
 end
+
 function system:execute()
     local systems = self._systems;
     for _, system in ipairs(systems) do
@@ -36,6 +49,7 @@ function system:deactivate()
         system:deactivate();
     end
 end
-function system:clear()
+
+function system:_clear()
     table.remove_all_for_array(self._systems);
 end
