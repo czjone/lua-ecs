@@ -51,6 +51,30 @@ function class(super)
     return class_type
 end
 
+function run_with_condition(condition, func)
+    if condition then
+        func();
+        return true
+    end
+    return false;
+end
+
+--[[
+    {
+        handler_value1 = handler_func1,
+        handler_value2 = handler_func2,
+        handler_value3 = handler_func3,
+    }
+]]
+function switch(arg, handler)
+    for k, v in pairs(handler) do
+        if k == arg then
+            v();
+            break
+        end
+    end
+end
+
 -- ==========================================================================
 -- xlib.core
 xlib.core = xlib.core or {}

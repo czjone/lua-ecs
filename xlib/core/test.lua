@@ -10,15 +10,25 @@ end
 function test:put(test, name)
     local t = type(test)
     local test_instance = nil
-    if t == "string" then
-        local model = require(test)
-        log:assert(type(model) == "table", "test model must a object.")
-        test_instance = model.new(self, name or model.name)
-    end
+    switch(t, {
+        string = function()
+            local model = require(test)
+            log:assert(type(model) == "table", "test model must a object.")
+            test_instance = model.new(self, name or model.name)
+        end,
+        table = function()
+            test_instance = test.new(self, name or test_instance.name)
+        end
+    })
+    -- if t == "string" then
+    --     local model = require(test)
+    --     log:assert(type(model) == "table", "test model must a object.")
+    --     test_instance = model.new(self, name or model.name)
+    -- end
 
-    if t == "table" then
-        test_instance = test.new(self, name or test_instance.name)
-    end
+    -- if t == "table" then
+    --     test_instance = test.new(self, name or test_instance.name)
+    -- end
     log:assert(test_instance.execute, "not found execute:" .. test)
     log:assert(test_instance.name, "testor name is nil:" .. test)
     self:_put_testor(test_instance)
