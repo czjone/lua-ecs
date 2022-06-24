@@ -7,11 +7,9 @@ function entity:ctor()
     self._components = {}
     self._components_pool = {}
 end
-function entity:add(com)
-end
-function entity:remove(com)
-end
-function entity:replace(com)
+
+function entity:add_com(com_type_id)
+    
 end
 
 function entity:reactivate()
