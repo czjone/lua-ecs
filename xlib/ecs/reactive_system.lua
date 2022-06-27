@@ -1,8 +1,7 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
-xlib.ecs.system = class({})
-xlib.ecs.reactive_system = class({})
+xlib.ecs.reactive_system = class(xlib.ecs.system)
 local reactive_system = xlib.ecs.reactive_system
 
 function reactive_system:ctor(name, context)

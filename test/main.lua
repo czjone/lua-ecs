@@ -15,6 +15,6 @@ test:put("test.ecs.component_test")
 -- test:put("test.ecs.group_test")
 -- test:put("test.ecs.collector_test")
 -- ecs test
-test:put("test.ecs.system_example_test")
+test:put("test.ecs.generator_test")
 
 test:run();

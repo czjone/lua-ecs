@@ -7,15 +7,13 @@ local matcher = xlib.ecs.matcher
 function matcher:ctor(entites, compare_func)
     self._compare = compare_func
     self._entites = entites
+    self._match_entites = {}
 end
 
 function matcher:get_entites()
-    local entites = self._entites
-    local compare = self._compare
-    local match_entites = {}
-    for i, entity in ipairs(entites) do
-        if (compare()) then
-            table.insert(match_entites, entity)
-        end
-    end
+    return self._match_entites;
+end
+
+function matcher:re_match()
+
 end

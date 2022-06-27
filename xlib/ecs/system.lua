@@ -8,24 +8,27 @@ function system:ctor(name, context)
     self.name = name;
     self.context = context
     self._systems = {}
+    self._activate = true;
     self._is_inited = false
 end
 
-function system:_set_status(status)
-    self._status = status;
-end
-
 function system:add_system(system)
+    local pos, _ = table.index_of(self._systems, system)
+    if (pos > 0) then
+        log:error("Add system to feature repeatedly ")
+    end
     if (self._is_inited == true) then
         log:error("add system only befor parent system iniztioned.");
     end
     table.insert(self._systems, system);
 end
 
-function system:iniztion()
-    local systems = self._systems;
-    for _, system in ipairs(systems) do
-        system:initialize();
+function system:initialize()
+    if not self._is_inited then
+        local systems = self._systems;
+        for _, system in ipairs(systems) do
+            system:initialize();
+        end
     end
 end
 
@@ -48,6 +51,11 @@ function system:deactivate()
     for _, system in ipairs(systems) do
         system:deactivate();
     end
+    self._activate = false;
+end
+
+function system:is_activate()
+    return self._activate;
 end
 
 function system:_clear()
