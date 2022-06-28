@@ -9,10 +9,22 @@ function entity:ctor()
 end
 
 function entity:add_com(com_type_id)
-    
+
+end
+
+function entity:remove_com(com_type_id)
+
+end
+
+function entity:replace_com(com_type_id)
+
 end
 
 function entity:reactivate()
+end
+
+
+function entity:deactivate()
 end
 
 function entity:get_components()

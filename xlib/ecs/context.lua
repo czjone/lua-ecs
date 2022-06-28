@@ -38,7 +38,7 @@ end
 function context:get_entites_group(entites_matcher)
     local group = self._groups[entites_matcher]
     if (group == nil) then
-        group = xlib.ecs.group.new(self._entites, entites_matcher);
+        group = xlib.ecs.group.new(entites_matcher);
     end
     return group;
 end

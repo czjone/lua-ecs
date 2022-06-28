@@ -1,26 +1,39 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
+-- A Collector can observe one or more groups from the same context
+-- and collects changed entities based on the specified groupEvent.
 xlib.ecs = xlib.ecs or {}
 xlib.ecs.collector = class({})
 local collector = xlib.ecs.collector;
-function collector:ctor(groups, group_events)
-    self._groups = groups;
-    self._group_events = group_events;
+---
+-- Creates a Collector and will collect changed entities
+-- based on the specified groupEvent.
+function collector:ctor(etities_group, com_group_for_entity_events)
+    self._com_group_for_entity = com_group_for_entity;
+    self._com_group_for_entity_evetns = com_group_for_entity_events;
     self._collectedEntities = {};
+
+    self:activate();
+end
+
+function collector:dector()
+    self:deactivate();
+    collector.super.dector(self)
 end
 
 function collector:get_collected_entities()
+    return self._collectedEntities;
 end
 
-function collector:activate(entities)
-    local groups = self._groups
+function collector:activate()
+    local groups = self._com_group_for_entity
     for _, group in ipairs(groups) do
-        group:removelistener(group.event.on_entity_added, self._add_entity)
-        group:addeventlistener(group.event.on_entity_added, self._add_entity)
+        group:removelistener(group.event.on_entity_added, self._add_entity, self)
+        group:addeventlistener(group.event.on_entity_added, self._add_entity, self)
     end
 end
 
-function collector:deactivate(entities)
+function collector:deactivate()
     local groups = self._groups
     for _, group in ipairs(groups) do
         group:removelistener(group.event.on_entity_added, self._add_entity)

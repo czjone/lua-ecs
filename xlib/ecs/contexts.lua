@@ -6,7 +6,6 @@ local contexts = xlib.ecs.contexts;
 
 function contexts:ctor()
     self._contexts = {}
-    self._entites = {}
 end
 
 function contexts:get_contexts()
