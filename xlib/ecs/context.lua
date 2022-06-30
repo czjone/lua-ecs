@@ -4,26 +4,25 @@ xlib.ecs = xlib.ecs or {}
 xlib.ecs.context = class({})
 local context = xlib.ecs.context;
 
-function context:ctor(entity_type)
-    self._entity_type = entity_type
-    self._entites_pool = xlib.core.object_pool.new(self._entity_type);
+function context:ctor()
     self._entites = {}
-    self._groups = {}; -- kv
+    self._collectors = {}
 end
 
 function context:create_entity()
-    local entity = self._entites_pool:get();
-    table.insert(self._entites, entity);
-    return entity;
+    -- local entity = self._entites_pool:get();
+    -- table.insert(self._entites, entity);
+    -- return entity;
 end
 
--- function context:get_collector(group_matchers, group_events)
-
--- end
+function context:get_entites_collector(matcher_func)
+    return table.get_or_create_class(self._collectors, matcher_func, xlib.ecs.matcher, self._entites, matcher_func);
+end
 
 function context:destroy_entity(entity)
-    table.remove_item(self._entites, entity);
-    self._entites_pool:put(entity)
+    if not self:has_entity(entity) then
+        log:error("not contais entity in enties.");
+    end
 end
 
 function context:has_entity(entity)

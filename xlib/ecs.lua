@@ -10,7 +10,6 @@
 require("xlib.ecs.collector")
 require("xlib.ecs.component")
 require("xlib.ecs.context")
-require("xlib.ecs.contexts")
 require("xlib.ecs.entity")
 require("xlib.ecs.group")
 require("xlib.ecs.matcher")

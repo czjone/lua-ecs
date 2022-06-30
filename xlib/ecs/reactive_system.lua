@@ -8,11 +8,11 @@ function reactive_system:ctor(name, context)
     self.name = name
     self.context = context
     self._execute_buf = {}
-    self._collector = self:get_collector();
+    self._entites_collector = self:get_entites_collector();
 end
 
-function reactive_system:get_collector()
-    return self.context:create_collector({}, {});
+function reactive_system:get_entites_collector()
+    error("not implements reactive_system:get_entites_collector in [" .. self.name .. "]");
 end
 
 function reactive_system:filter(entity)
@@ -21,7 +21,7 @@ end
 
 function reactive_system:_execute()
     local entities = self._execute_buf;
-    local collect_entities = self._collector:get_collected_entities();
+    local collect_entities = self._entites_collector:get_collected_entities();
     for _, entity in ipairs(collect_entities) do
         if (self:filter(entity)) then
             table.insert(entities, entity)
@@ -30,9 +30,11 @@ function reactive_system:_execute()
     self:execute(entities);
     table.remove_all_for_array(entities);
 end
+
 function reactive_system:execute(entities)
     error("not execute implements for reactive_system.");
 end
+
 function reactive_system:activate()
     self._collector:activate();
 end

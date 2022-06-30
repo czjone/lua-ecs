@@ -8,19 +8,14 @@ function feature:ctor(name)
     self.context = xlib.ecs.context.new();
 end
 
-function feature:add_system(system)
-    local t = type(system)
-    local instance = nil
-    if t == "string" then
-        instance = require(system).new(system, self.context);
+function feature:add_system(system, name)
+    if not name and type(system) == "string" then
+        name = system;
+    else
+        name = "undefined"
     end
-
-    if t == "table" then
-        instance = system
-    end
-
-    feature.super.add_system(instance);
-
+    local sys = create(system, name, self.context);
+    feature.super.add_system(self, sys);
 end
 
 return feature

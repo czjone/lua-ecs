@@ -6,7 +6,9 @@ test.name = "class test"
 
 function test:execute()
     local expect_val = 1
-    local c = class({val = expect_val})
+    local c = class({
+        val = expect_val
+    })
     local d = class(c)
 
     local c_instance = c.new()
@@ -15,6 +17,9 @@ function test:execute()
     local ret = true
     ret = self.test:expect_true(d_instance.val == expect_val, "d_instance.val == ret") and ret
     ret = self.test:expect_true(c_instance.val == expect_val, "c_instance.val == ret") and ret
+
+    ret = self.test:expect_true(c_instance:is_type(c), "c instance is c type") and ret
+    ret = self.test:expect_false(c_instance:is_type(d), "c instance is not d type") and ret
     return ret
 end
 

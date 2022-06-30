@@ -14,6 +14,11 @@ function class(super)
     local class_type = {}
     class_type.ctor = false
     class_type.super = super
+
+    class_type.is_type = function(_self, __class)
+        return _self.__class_type == __class
+    end
+
     class_type.new = function(...)
         local obj = {}
         setmetatable(obj, {
@@ -21,6 +26,7 @@ function class(super)
             -- 5.2 or later.
             __gc = function()
                 if (obj.dector) then
+                    obj.__class_type = nil
                     obj:dector()
                 end
             end
@@ -38,6 +44,9 @@ function class(super)
             end
             create(class_type, ...)
         end
+
+        obj.__class_type = class_type
+
         return obj
     end
     if super then
@@ -73,6 +82,23 @@ function switch(arg, handler)
             break
         end
     end
+end
+
+function create(model, ...)
+    local t = type(model)
+    local ret = nil
+    local args = {...}
+    switch(t, {
+        string = function()
+            local model = require(model)
+            log:assert(type(model) == "table", "model must a class.")
+            ret = model.new(table.unpack(args))
+        end,
+        table = function()
+            ret = model.new(table.unpack(args))
+        end
+    })
+    return ret;
 end
 
 -- ==========================================================================

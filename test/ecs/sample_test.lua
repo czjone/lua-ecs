@@ -6,12 +6,13 @@ function sample:ctor(test)
 end
 
 function sample:execute()
-    local ecs_application = require("sample.ecs_application").new();
-    ecs_application:dispatch_event(ecs_application.event.on_init);
+    local app = require("sample.ecs_application").new();
+    local app_event = app.event
+    app:dispatch_event(app_event.on_init);
     for i = 1, 10, 1 do
-        ecs_application:dispatch_event(ecs_application.event.on_update);
+        app:dispatch_event(app_event.on_update);
     end
-    ecs_application:dispatch_event(ecs_application.event.destory);
+    app:dispatch_event(app_event.destory);
     return true;
 end
 

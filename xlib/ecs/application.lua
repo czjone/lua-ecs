@@ -1,5 +1,7 @@
-local application = class(xlib.core.eventdispather)
-
+xlib = xlib or {}
+xlib.ecs = xlib.ecs or {}
+xlib.ecs.application = class(xlib.core.eventdispather)
+local application = xlib.ecs.application
 application.event = {
     on_init = 1,
     on_update = 2,
@@ -14,7 +16,7 @@ function application:ctor()
 end
 
 function application:_on_init()
-    self._feature = require("sample.sources.feature").new()
+    error("not implement application _on_init")
 end
 
 function application:_on_update()

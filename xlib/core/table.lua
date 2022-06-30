@@ -10,7 +10,7 @@ function table.index_of(_table, val)
 end
 
 function table.remove_all_for_array(array)
-    for i = #array,1,-1 do
+    for i = #array, 1, -1 do
         table.remove(array)
     end
 end
@@ -22,5 +22,14 @@ function table.remove_item(_table, val)
             pos = _pos
         end
     end
-    table.remove(_table,pos);
+    table.remove(_table, pos);
+end
+
+function table.get_or_create_class(_table, key, _class, ...)
+    local ret = _table[key];
+    if not ret then
+        ret = _class.new(...);
+        _table[key] = ret;
+    end
+    return ret;
 end
