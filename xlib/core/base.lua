@@ -136,3 +136,5 @@ function base:dector()
         self[k] = nil
     end
 end
+
+
