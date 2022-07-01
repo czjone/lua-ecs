@@ -1,7 +1,7 @@
 # lua ecs framework
     
 ## lua  ecs sample
-    test/ecs/generator_test.lua
+    sample/ecs_world.lua
 
 ## run test
 ``` sh
