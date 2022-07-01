@@ -4,6 +4,21 @@ xlib.version = "0.0.1"
 
 -- ==========================================================================
 -- xlib.class
+function to_class(_class)
+    if type(_class) == "string" then
+        return require(_class);
+    end
+    return _class;
+end
+
+function to_classes(_classes)
+    local classes = {}
+    for _, v in pairs(_classes) do
+        table.insert(classes, to_class(v));
+    end
+    return classes
+end
+
 function class(super)
     if (type(super) == "string") then
         super = require(super) -- import model
@@ -14,11 +29,25 @@ function class(super)
     local class_type = {}
     class_type.ctor = false
     class_type.super = super
-
-    class_type.is_type = function(_self, __class)
-        return _self.__class_type == __class
+    --- func dector
+    class_type.super.dector = class_type.super.dector or function(_self)
     end
 
+    --- func is_type
+    class_type.is_type = function(_self, __class)
+        return _self.__class_type == to_class(__class)
+    end
+
+    --- func is_type_fast
+    class_type.is_type_fast = function(_self, __class)
+        return _self.__class_type == __class
+    end
+    --- func get_class
+    class_type.get_class = function(_self, __class)
+        return _self.__class_type;
+    end
+
+    --- func new
     class_type.new = function(...)
         local obj = {}
         setmetatable(obj, {
@@ -58,14 +87,6 @@ function class(super)
         })
     end
     return class_type
-end
-
-function run_with_condition(condition, func)
-    if condition then
-        func();
-        return true
-    end
-    return false;
 end
 
 --[[

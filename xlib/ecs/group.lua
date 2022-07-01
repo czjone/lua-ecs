@@ -1,3 +1,6 @@
+-- ==========================================================================
+-- xlib.ecs.groun
+-- entites groups
 xlib.ecs = xlib.ecs or {}
 xlib.ecs.group = class(xlib.core.eventdispather)
 local group = xlib.ecs.group

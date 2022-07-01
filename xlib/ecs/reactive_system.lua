@@ -21,7 +21,7 @@ end
 
 function reactive_system:_execute()
     local entities = self._execute_buf;
-    local collect_entities = self._entites_collector:get_collected_entities();
+    local collect_entities = self._entites_collector:get_entites();
     for _, entity in ipairs(collect_entities) do
         if (self:filter(entity)) then
             table.insert(entities, entity)

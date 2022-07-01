@@ -15,7 +15,6 @@ function object_pool:get()
     local get_val = nil;
     if #self._pool == 0 then
         get_val = self._handler:create_object()
-        -- table.insert(pool, get_val);
     else
         get_val = pool[1]
         self._handler:rest_object(get_val)

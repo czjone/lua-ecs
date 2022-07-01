@@ -25,7 +25,7 @@ function table.remove_item(_table, val)
     table.remove(_table, pos);
 end
 
-function table.get_or_create_class(_table, key, _class, ...)
+function table.get_or_create(_table, key, _class, ...)
     local ret = _table[key];
     if not ret then
         ret = _class.new(...);

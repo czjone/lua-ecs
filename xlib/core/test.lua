@@ -69,6 +69,23 @@ function test:expect_false(out_val, des)
     return self:expect(out_val, false, des)
 end
 
+function test:performance(loop, func, des, allow_runtimes_ms)
+    local start = os.clock()
+    local ret = nil;
+    loop = loop or 1
+    for i = 1, loop, 1 do
+        ret = func();
+    end
+    local end_t = os.clock()
+    local running_time = (end_t - start) * 1000
+    if (allow_runtimes_ms ~= nil) then
+        log:assert(running_time <= allow_runtimes_ms, "running time more than " .. tostring(allow_runtimes_ms) ..
+            " ms,running time:" .. tostring(running_time) .. " MS");
+    end
+    log:ok("Running time:", running_time, "MS", "loop times:", loop, ":", des)
+    return ret;
+end
+
 function test:run()
     log:info("===================================================")
     log:info("      author:      ", "solyess")
@@ -82,6 +99,7 @@ function test:run()
     for _, vt in ipairs(self._test) do
         log:info("--------------------------------")
         log:info(string.format("[%s]", vt.name))
+        -- running time performance
         if (not memory:monitor(vt.f, vt.name)) then
             log:fail("----- [" .. vt.name .. "] fail -----")
             log:fail(debug.traceback())
@@ -89,6 +107,7 @@ function test:run()
         else
             success = success + 1
         end
+
         -- log:info("-----------------------------")
     end
     log:info("")
