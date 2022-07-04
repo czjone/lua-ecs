@@ -1,6 +1,7 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
+log:assert(xlib.ecs.system, "xlib.ecs.system is nil")
 xlib.ecs.reactive_system = class(xlib.ecs.system)
 local reactive_system = xlib.ecs.reactive_system
 
@@ -14,6 +15,10 @@ end
 function reactive_system:get_entites_collector()
     error("not implements reactive_system:get_entites_collector in [" .. self.name .. "]");
 end
+
+-- function reactive_system:initialize()
+    
+-- end
 
 function reactive_system:filter(entity)
     return true;

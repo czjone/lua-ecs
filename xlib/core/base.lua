@@ -5,6 +5,9 @@ xlib.version = "0.0.1"
 -- ==========================================================================
 -- xlib.class
 function to_class(_class)
+    if _class == nil then
+        return nil
+    end
     if type(_class) == "string" then
         return require(_class);
     end
@@ -20,12 +23,9 @@ function to_classes(_classes)
 end
 
 function class(super)
-    if (type(super) == "string") then
-        super = require(super) -- import model
-    end
-    if (super == nil) then
-        super = {}
-    end
+
+    super = to_class(super) or {}
+
     local class_type = {}
     class_type.ctor = false
     class_type.super = super
@@ -78,6 +78,7 @@ function class(super)
 
         return obj
     end
+
     if super then
         setmetatable(class_type, {
             __index = function(t, k)
@@ -89,36 +90,9 @@ function class(super)
     return class_type
 end
 
---[[
-    {
-        handler_value1 = handler_func1,
-        handler_value2 = handler_func2,
-        handler_value3 = handler_func3,
-    }
-]]
-function switch(arg, handler)
-    for k, v in pairs(handler) do
-        if k == arg then
-            v();
-            break
-        end
-    end
-end
-
 function create(model, ...)
     local t = type(model)
-    local ret = nil
-    local args = {...}
-    switch(t, {
-        string = function()
-            local model = require(model)
-            log:assert(type(model) == "table", "model must a class.")
-            ret = model.new(table.unpack(args))
-        end,
-        table = function()
-            ret = model.new(table.unpack(args))
-        end
-    })
+    local ret = to_class(model).new(...)
     return ret;
 end
 
@@ -136,5 +110,4 @@ function base:dector()
         self[k] = nil
     end
 end
-
 

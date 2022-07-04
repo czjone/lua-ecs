@@ -22,7 +22,9 @@ function table.remove_item(_table, val)
             pos = _pos
         end
     end
-    table.remove(_table, pos);
+    if pos > 0 then
+        table.remove(_table, pos);
+    end
 end
 
 function table.get_or_create(_table, key, _class, ...)

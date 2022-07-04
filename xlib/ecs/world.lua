@@ -1,3 +1,4 @@
+-- https://github.com/sniper00/entitas-lua
 xlib = xlib or {}
 xlib.ecs = xlib.ecs or {}
 xlib.ecs.world = class(xlib.core.eventdispather)
@@ -12,24 +13,28 @@ function world:ctor()
     self._feature = nil;
     self:add_eventlistener(world.event.on_init, self._on_init);
     self:add_eventlistener(world.event.on_update, self._on_update);
-    self:add_eventlistener(world.event.on_destroy, self._on_destroy);
+    self:add_eventlistener(world.event.on_destroy, self.on_destroy);
 end
 
 function world:_on_init()
-    error("not implement application _on_init")
+    self._feature:initialize();
 end
 
 function world:_on_update()
     self._feature:execute();
 end
 
-function world:_on_destroy()
+function world:on_destroy()
     self._feature = nil;
 end
 
 -- application driver.
 function world:dispatch_event(evt_key)
     self:dispatch(evt_key);
+end
+
+function world:is_alive()
+    return self._feature ~= nil
 end
 
 return world

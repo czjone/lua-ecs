@@ -1,16 +1,15 @@
 local move_system = class(xlib.ecs.reactive_system)
 
-move_system.follow_entites = {
-    game = to_class("sample.entites.game_entity"),
-    input = to_class("sample.entites.input_entity")
-}
+move_system._game_entity = "sample.entites.game_entity"
+move_system._input_entity = "sample.entites.game_entity"
 
 function move_system:get_entites_collector()
-    return self.context:get_collector_with_groups(move_system.follow_entites);
+    return self.context:get_collector_with_groups({self.context:get_group_for_entites_class(self._game_entity),
+                                                   self.context:get_group_for_entites_class(self._input_entity)});
 end
 
 function move_system:filter(entity)
-    return entity:is_type(move_system.follow_entites.game);
+    return entity:is_type(self._game_entity);
 end
 
 function move_system:execute(entites)

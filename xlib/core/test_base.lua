@@ -10,5 +10,5 @@ function test_base:ctor(test, name)
 end
 
 function test_base:execute()
-    error("not implements test execute.")
+    error("not implements test.execute.")
 end

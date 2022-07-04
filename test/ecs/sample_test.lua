@@ -7,14 +7,18 @@ end
 
 function sample:execute()
     local world_class = require("sample.ecs_world")
-    local app = world_class.new();
+    -- create world
+    local world = world_class.new()
+    local app_event = world.event
+    -- init world
+    world:dispatch_event(app_event.on_init);
     
-    local app_event = app.event
-    app:dispatch_event(app_event.on_init);
     for i = 1, 10, 1 do
-        app:dispatch_event(app_event.on_update);
+        -- world loop on every frame.
+        world:dispatch_event(app_event.on_update);
     end
-    app:dispatch_event(app_event.destory);
+    -- world destroy
+    world:dispatch_event(app_event.destory);
     return true;
 end
 

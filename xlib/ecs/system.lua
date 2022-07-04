@@ -23,6 +23,10 @@ function system:add_system(system)
     table.insert(self._systems, system);
 end
 
+function system:remove_system(system)
+    table.remove_item(self._systems, system);
+end
+
 function system:initialize()
     if not self._is_inited then
         local systems = self._systems;
@@ -40,6 +44,7 @@ function system:execute()
         exec(system);
     end
 end
+
 function system:activate()
     local systems = self._systems;
     for _, system in ipairs(systems) do
