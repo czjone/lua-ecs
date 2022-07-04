@@ -22,25 +22,25 @@ function test:execute()
     ret = self.test:expect_false(c_instance:is_type(d), "c instance is not d type") and ret
 
     -------------------------------------------------------------
-    -- performance
+    -- performance  is type
     local loop, allow_times_ms = 1000000, 200
 
     self.test:performance(loop, function()
-    end, "empty function invork.", allow_times_ms);
+    end, "IS_TYPE:empty function invork.", allow_times_ms);
 
     self.test:performance(loop, function()
         local f = function()
         end
         f();
-    end, "nesting empty function invork.", allow_times_ms);
+    end, "IS_TYPE:nesting empty function invork.", allow_times_ms);
 
     self.test:performance(loop, function()
         c_instance:is_type(c)
-    end, "type is test.", allow_times_ms);
+    end, "IS_TYPE:type is test.", allow_times_ms);
 
     self.test:performance(loop, function()
         c_instance:is_type_fast(c)
-    end, "type is test fast.", allow_times_ms);
+    end, "IS_TYPE:type is test fast.", allow_times_ms);
 
     return ret
 end
