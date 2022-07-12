@@ -1,5 +1,3 @@
-require("xlib.core.base")
-
 local core_table_extention_test = class(xlib.core.test_base)
 
 function core_table_extention_test:ctor(test)

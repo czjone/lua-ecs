@@ -1,8 +1,8 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
-log:assert(xlib.core.eventdispather, "xlib.core.eventdispather is nil")
-xlib.ecs.context = class(xlib.core.eventdispather)
+log:assert(xlib.core.eventdispatcher, "xlib.core.eventdispatcher is nil")
+xlib.ecs.context = class(xlib.core.eventdispatcher)
 local context = xlib.ecs.context;
 
 function context:ctor()

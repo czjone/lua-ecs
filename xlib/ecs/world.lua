@@ -1,7 +1,7 @@
 -- https://github.com/sniper00/entitas-lua
 xlib = xlib or {}
 xlib.ecs = xlib.ecs or {}
-xlib.ecs.world = class(xlib.core.eventdispather)
+xlib.ecs.world = class(xlib.core.eventdispatcher)
 local world = xlib.ecs.world
 world.event = {
     on_init = 1,

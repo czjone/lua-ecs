@@ -1,7 +1,7 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
-xlib.ecs.system = class(xlib.core.eventdispather)
+xlib.ecs.system = class(xlib.core.eventdispatcher)
 local system = xlib.ecs.system
 
 function system:ctor(name, context)

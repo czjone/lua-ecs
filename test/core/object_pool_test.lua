@@ -1,5 +1,3 @@
-require("xlib.core.base")
-
 local object_pool_test = class(xlib.core.test_base)
 
 object_pool_test.name = "object pool test"

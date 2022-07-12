@@ -1,29 +1,42 @@
-require("xlib.core.base")
-
 local test = class(xlib.core.test_base)
 
 test.name = "class test"
 
-function test:execute()
-    local expect_val = 1
-    local c = class({
-        val = expect_val
+function test:ctor(test, name)
+    self.expect_val = 1
+    self.c = class({
+        val = self.expect_val
     })
-    local d = class(c)
+    self.d = class(self.c)
+end
 
-    local c_instance = c.new()
-    local d_instance = d.new()
+function test:execute()
+
+    local loop, create_class_loop, allow_times_ms = 1000000, 50000, 200
+
+    local expect_val = self.expect_val;
+    local c = self.c
+    local d = self.d
 
     local ret = true
-    ret = self.test:expect_true(d_instance.val == expect_val, "d_instance.val == ret") and ret
-    ret = self.test:expect_true(c_instance.val == expect_val, "c_instance.val == ret") and ret
 
+    self.test:performance(create_class_loop, function()
+        local c_instance = self.c.new()
+        local d_instance = self.d.new()
+    end, "class instance", allow_times_ms);
+
+    local c_instance = self.c.new()
+    local d_instance = self.d.new()
+
+    ret = self.test:expect_true(c_instance:get_class() == self.c, "type test") and ret
+    ret = self.test:expect_true(d_instance:get_class() == self.d, "type test") and ret
+    ret = self.test:expect_true(d_instance.val == expect_val, "d_instance.val") and ret
+    ret = self.test:expect_true(c_instance.val == expect_val, "c_instance.val") and ret
     ret = self.test:expect_true(c_instance:is_type(c), "c instance is c type") and ret
     ret = self.test:expect_false(c_instance:is_type(d), "c instance is not d type") and ret
 
-    -------------------------------------------------------------
-    -- performance  is type
-    local loop, allow_times_ms = 1000000, 200
+    -- -------------------------------------------------------------
+    -- -- performance  is type
 
     self.test:performance(loop, function()
     end, "IS_TYPE:empty function invork.", allow_times_ms);
@@ -42,6 +55,11 @@ function test:execute()
         c_instance:is_type_fast(c)
     end, "IS_TYPE:type is test fast.", allow_times_ms);
 
+    ret = self.test:expect_false(c_instance:is_destroy(), "c destroy status test") and ret
+    ret = self.test:expect_false(d_instance:is_destroy(), "c destroy status test") and ret
+    c_instance:destroy();
+    ret = self.test:expect_true(c_instance:is_destroy(), "destroy status test") and ret
+    ret = self.test:expect_false(d_instance:is_destroy(), "destroy status test") and ret
     return ret
 end
 

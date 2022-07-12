@@ -2,7 +2,7 @@
 -- xlib.ecs.groun
 -- entites groups
 xlib.ecs = xlib.ecs or {}
-xlib.ecs.group = class(xlib.core.eventdispather)
+xlib.ecs.group = class(xlib.core.eventdispatcher)
 local group = xlib.ecs.group
 
 group.event = group.event or {}

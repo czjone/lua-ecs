@@ -14,6 +14,13 @@ function to_class(_class)
     return _class;
 end
 
+local function to_class__(_class)
+    -- if type(_class) == string_ then
+    --     return require(_class);
+    -- end
+    return _class;
+end
+
 function to_classes(_classes)
     local classes = {}
     for _, v in pairs(_classes) do
@@ -35,7 +42,26 @@ function class(super)
 
     --- func is_type
     class_type.is_type = function(_self, __class)
-        return _self.__class_type == to_class(__class)
+        if type(__class) == "string" then
+            __class = require(__class);
+        end
+        return _self.__class_type == __class
+    end
+    -- func destory
+    class_type.destroy = class_type.destroy or function(_self)
+        _self.__is_alive = nil;
+        if (_self.dector) then
+            _self.__class_type = nil
+            _self:dector()
+        else
+            for k, _ in pairs(_self) do
+                _self[k] = nil
+            end
+        end
+    end
+    -- func is destroy
+    class_type.is_destroy = function(_self)
+        return not _self.__is_alive;
     end
 
     --- func is_type_fast
@@ -54,12 +80,16 @@ function class(super)
             __index = class_type,
             -- 5.2 or later.
             __gc = function()
-                if (obj.dector) then
-                    obj.__class_type = nil
-                    obj:dector()
+                -- if (obj.dector) then
+                --     obj.__class_type = nil
+                --     obj:dector()
+                -- end
+                if (obj.destroy) then
+                    obj:destroy();
                 end
             end
         })
+        obj.__is_alive = true;
         do
             local create = nil
             local callsuper = nil
@@ -96,18 +126,5 @@ function create(model, ...)
     return ret;
 end
 
--- ==========================================================================
--- xlib.core
+xlib = xlib or {}
 xlib.core = xlib.core or {}
-xlib.core.base = class()
-local base = xlib.core.base
-function base:ctor(...)
-    self.is_xobj = true
-end
-
-function base:dector()
-    for k, _ in pairs(self) do
-        self[k] = nil
-    end
-end
-

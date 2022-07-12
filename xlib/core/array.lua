@@ -17,7 +17,7 @@ function array:pop()
 end
 
 function array:get(index)
-    if index > #self.data then
+    if index > #self._data then
         log:error("Index out of range exception!");
     end
     return self._data[index];
@@ -31,9 +31,40 @@ function array:push(val)
     table.insert(self._data, val)
 end
 
+function array:has(val)
+    local data = self._data
+    for _, v in ipairs(data) do
+        if v == val then
+            return true
+        end
+    end
+    return false;
+end
+
+function array:remove(val)
+    local data = self._data
+    local pos = -1;
+    for p, v in ipairs(data) do
+        if v == val then
+            pos = p;
+            break
+        end
+    end
+    if pos > 0 then
+        table.remove(self._data, pos);
+    end
+end
+
 function array:clear()
     for i = 1, #self._data, 1 do
         table.remove(self._data, 1);
+    end
+end
+
+function array:foreach(func)
+    local d = self._data;
+    for _, v in ipairs(d) do
+        func(v)
     end
 end
 

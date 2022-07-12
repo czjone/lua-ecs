@@ -26,7 +26,6 @@ function logger:ok(...)
     self._print("[ OK ]", ...)
 end
 
-
 function logger:assert(exp, des)
     if not exp then
         self:error(des)

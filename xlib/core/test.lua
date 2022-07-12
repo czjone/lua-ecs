@@ -59,11 +59,12 @@ function test:performance(loop, func, des, allow_runtimes_ms)
     local end_t = os.clock()
     local running_time = (end_t - start) * 1000
     if (allow_runtimes_ms ~= nil) then
-        log:assert(running_time <= allow_runtimes_ms, "running time more than " .. tostring(allow_runtimes_ms) ..
-            " ms,running time:" .. tostring(running_time) .. " MS");
+        log:assert(running_time <= allow_runtimes_ms,
+            '[ ' .. des .. "] running time more than " .. tostring(allow_runtimes_ms) .. " ms,running time:" ..
+                tostring(running_time) .. " ms");
     end
-    log:ok("Running time:", running_time, "MS", "loop times:", loop, ":", des)
-    return ret;
+    log:ok("time consuming:", running_time, "ms", "loop times:", loop, ":", des)
+    return running_time;
 end
 
 function test:_show_fail(...)
@@ -83,7 +84,6 @@ end
 function test:_show_testor(test_name)
     log:info("--------------------------------")
     log:info(string.format("[%s]", test_name))
-    log:info()
 end
 
 function test:_show_testor_fail(test_name)
@@ -92,11 +92,10 @@ function test:_show_testor_fail(test_name)
 end
 
 function test:_show_end(count, success)
-    log:info("")
     log:info("=========================================")
     log:info("-----------------------------------------")
-    log:info("|     total:   ", count,      "", "", "|")
-    log:info("|     success: ", success,    "", "", "|")
+    log:info("|     total:   ", count, "", "", "|")
+    log:info("|     success: ", success, "", "", "|")
     log:info("|     fail:    ", count - success, "", "", "|")
     -- log:fail(string.format("execute:%u success:%u fail:%u", count, success, fail))
     log:info("-----------------------------------------")

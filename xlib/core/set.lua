@@ -18,6 +18,10 @@ function set:insert(k, v)
     self._size = self._size + 1
 end
 
+function set:get_all()
+    return self._data;
+end
+
 function set:set_value(k, v)
     if self._data[k] == nil then
         self._size = self._size + 1
@@ -27,6 +31,10 @@ end
 
 function set:has(k)
     return self._data[k] ~= nil;
+end
+
+function set:get_value(k)
+    return self._data[k];
 end
 
 function set:remove(k)
@@ -41,6 +49,13 @@ function set:clear()
         self._data[k] = nil
     end
     self._size = 0;
+end
+
+function set:foreach(func)
+    local d = self._data;
+    for k, v in pairs(d) do
+        func(k, v)
+    end
 end
 
 return set;
