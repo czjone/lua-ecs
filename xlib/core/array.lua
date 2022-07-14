@@ -23,12 +23,20 @@ function array:get(index)
     return self._data[index];
 end
 
-function array:get_all()
+function array:get_buf()
     return self._data;
 end
 
 function array:push(val)
-    table.insert(self._data, val)
+    self:insert(#self._data + 1, val);
+end
+
+function array:insert(pos, val)
+    table.insert(self._data, pos, val)
+end
+
+function array:replace(pos, val)
+    self._data[pos] = val;
 end
 
 function array:has(val)
@@ -59,6 +67,25 @@ function array:clear()
     for i = 1, #self._data, 1 do
         table.remove(self._data, 1);
     end
+end
+
+function array:find(func)
+    for i = 1, #self._data, 1 do
+        local v = self._data[i]
+        if func(v) then
+            return i, v;
+        end
+    end
+    return -1, nil
+end
+
+function array:copy()
+    local data = self._data;
+    local arr = array.new();
+    for i, item in ipairs(data) do
+        table.insert(arr, item);
+    end
+    return arr;
 end
 
 function array:foreach(func)

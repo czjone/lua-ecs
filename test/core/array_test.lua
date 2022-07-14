@@ -9,7 +9,7 @@ function array_test:execute()
     local ret = true;
     local _array = xlib.core.array.new()
 
-    local loop, allow_times_ms = 800000, 200
+    local loop, allow_times_ms = 500000, 200
 
     local function push_item(item)
         _array:push(1);

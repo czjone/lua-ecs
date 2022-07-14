@@ -1,58 +1,70 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
-local entity_base = {}
-
--- local function __add_com(entites, com, ...)
-
--- end
-
--- setmetatable(entity_base, {
---     __index = function(t, k)
---         -- add
---         log:info(k);
---         -- remove
-
---         -- replace
---     end
--- })
-xlib.ecs.entity = class(entity_base)
+xlib.ecs.entity = class(xlib.core.eventdispatcher)
 local entity = xlib.ecs.entity
 
+entity.event = {
+    add = 1,
+    remove = 2,
+    replace = 3
+}
+
 function entity:ctor()
-    self._compnents = {}
+    self._components = xlib.core.set.new();
+    self._enable = nil;
 end
 
-function entity:has_compnent(__class)
-    return self._compnents[__class] ~= nil;
+function entity:has(_class)
+    return self._components:has(_class);
 end
 
-function entity:add_compnent(com)
-    local __class = com:get_class();
-    if (self:has_compnent(__class)) then
-        log:error("Cannot add component '" .. com .. "' to " .. entity .. "!");
+function entity:has_any(_classes)
+    -- return self._components:find_all(function(k,v)
+    --     return v:get_class 
+    -- end)
+    return false;
+end
+
+function entity:add(com)
+    if self._enable then
+        local components = self._components;
+        self._components:set_value(com:get_class(), com);
+        self:dispatch(entity.event.add, com);
     end
-    self._compnents[__class] = com;
 end
 
-function entity:remove_compnent(com)
-    local __class = com:get_class();
-    if not (self:has_compnent(__class)) then
-        log:error("No component '" .. com .. "' remove from " .. entity .. "!");
+function entity:replace(com)
+    if self._enable then
+        local components = self._components;
+        local _class = com:get_class();
+        if not components:has(_class) then
+            self:add(com);
+        else
+            components:remove(_class);
+            components:set_value(_class, com);
+            self:dispatch(entity.event.replace, com);
+        end
     end
-    self._compnents[__class] = nil;
 end
 
-function entity:get_com(__class)
-    if not self:has_compnent(__class) then
-        self:add_compnent(__class.new());
+function entity:dector()
+    self:deactivate();
+    entity.super.dector(self);
+end
+
+function entity:remove(com)
+    if self._enable then
+        local components = self._components;
+        local _class = com:get_class();
+        if components:has(_class) then
+            components:remove(_class);
+            self:dispatch(entity.event.remove, com);
+        end
     end
-    return self._compnents[__class];
 end
 
-function entity:reactivate()
-end
-
-function entity:deactivate()
+function entity:activate()
+    self._enable = true;
 end
 

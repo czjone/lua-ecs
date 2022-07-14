@@ -4,52 +4,31 @@ xlib.ecs = xlib.ecs or {}
 xlib.ecs.collector = class({})
 local collector = xlib.ecs.collector;
 
-function collector:ctor(etities_group)
-    self._etities_group = {}
-    self._collect_entites = {}
-    self:activate();
+function collector:ctor(groups)
+    self._groups = xlib.core.array.new()
+    self._entites_buf = xlib.core.array.new();
 end
 
-function collector:dector()
-    self:deactivate();
-    collector.super.dector(self)
-end
-
-function collector:get_entites()
-    return self._collect_entites;
-end
-
-function collector:get_groups()
-    return self._etities_group
-end
-
-function collector:activate()
-    local groups = self._etities_group
+function collector:_collect_entites()
+    local _entites_buf = self._entites_buf
+    _entites_buf:clear();
+    local groups = self._groups;
     for _, group in ipairs(groups) do
-        group:remove_listener(group.event.on_entity_added, self._add_entity, self)
-        group:add_eventlistener(group.event.on_entity_added, self._add_entity, self)
-
-        group:remove_listener(group.event.on_entity_removed, self._remove_enity, self)
-        group:add_eventlistener(group.event.on_entity_removed, self._remove_enity, self)
+        local entites = group:get_entites();
+        _entites_buf:push(entites)
     end
 end
 
-function collector:deactivate()
-    local groups = self._etities_group
-    for _, group in ipairs(groups) do
-        group:remove_listener(group.event.on_entity_added, self._add_entity)
-        group:remove_listener(group.event.on_entity_removed, self._remove_enity)
-    end
+function collector:_collect_clear()
+
 end
 
-function collector:clear()
-    table.remove_all_for_array(self._collect_entites);
+function collector:get_entites_array()
+    self:_collect_entites();
+    local entites_array = self._collect_entites:copy()
+    return entites_array
 end
 
-function collector:_add_entity(entity)
-    table.insert(self._collect_entites, entity);
-end
-
-function collector:_remove_enity(entity)
-    table.remove_item(self._collect_entites, entity);
+function collector:get_groups_array()
+    return self._groups
 end

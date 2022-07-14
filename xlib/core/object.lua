@@ -29,6 +29,51 @@ function to_classes(_classes)
     return classes
 end
 
+function dector(_self)
+
+end
+
+function is_destroy(_self)
+    return not _self.__is_alive;
+end
+
+function is_type(_self, __class)
+    if type(__class) == "string" then
+        __class = require(__class);
+    end
+    return _self.__class_type == __class
+end
+
+--- func is_type_fast
+function is_type_fast(_self, __class)
+    return _self.__class_type == __class
+end
+--- func get_class
+function get_class(_self, __class)
+    return _self.__class_type;
+end
+
+--- func 
+function is_instance(_self)
+    return self:get_class();
+end
+
+function destroy(_self)
+    if type(_self) ~= "table" then
+        return;
+    end
+    _self.__is_alive = nil;
+    if (_self.dector) then
+        _self.__class_type = nil
+        _self:dector()
+    else
+        for k, v in pairs(_self) do
+            _self[k] = nil
+            destroy(v);
+        end
+    end
+end
+
 function class(super)
 
     super = to_class(super) or {}
@@ -36,42 +81,14 @@ function class(super)
     local class_type = {}
     class_type.ctor = false
     class_type.super = super
-    --- func dector
-    class_type.super.dector = class_type.super.dector or function(_self)
-    end
-
-    --- func is_type
-    class_type.is_type = function(_self, __class)
-        if type(__class) == "string" then
-            __class = require(__class);
-        end
-        return _self.__class_type == __class
-    end
-    -- func destory
-    class_type.destroy = class_type.destroy or function(_self)
-        _self.__is_alive = nil;
-        if (_self.dector) then
-            _self.__class_type = nil
-            _self:dector()
-        else
-            for k, _ in pairs(_self) do
-                _self[k] = nil
-            end
-        end
-    end
-    -- func is destroy
-    class_type.is_destroy = function(_self)
-        return not _self.__is_alive;
-    end
-
-    --- func is_type_fast
-    class_type.is_type_fast = function(_self, __class)
-        return _self.__class_type == __class
-    end
-    --- func get_class
-    class_type.get_class = function(_self, __class)
-        return _self.__class_type;
-    end
+    -- functions
+    class_type.super.dector = class_type.super.dector or dector
+    class_type.is_type = class_type.is_type or is_type
+    class_type.destroy = class_type.destroy or destroy;
+    class_type.is_destroy = class_type.is_destroy or is_destroy
+    class_type.is_type_fast = class_type.is_type_fast or is_type_fast
+    class_type.get_class = class_type.get_class or get_class
+    class_type.is_instance = class_type.is_instance or is_instance
 
     --- func new
     class_type.new = function(...)
@@ -80,10 +97,6 @@ function class(super)
             __index = class_type,
             -- 5.2 or later.
             __gc = function()
-                -- if (obj.dector) then
-                --     obj.__class_type = nil
-                --     obj:dector()
-                -- end
                 if (obj.destroy) then
                     obj:destroy();
                 end

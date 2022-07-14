@@ -34,11 +34,11 @@ function object_pool_test:execute()
     function object_pool_handler:ctor(test_class)
 
     end
-    function object_pool_handler:rest_object(obj)
+    function object_pool_handler:on_rest_object(obj)
         obj.id = rest_id;
     end
 
-    function object_pool_handler:reconvery_object(obj)
+    function object_pool_handler:on_reconvery_object(obj)
         -- do sth.set parent to nil for unity.
         -- log:info("---------------------------")
         obj.is_free = true;

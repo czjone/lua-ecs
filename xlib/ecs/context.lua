@@ -1,101 +1,64 @@
 -- -- ==========================================================================
 -- -- xlib.ecs
 xlib.ecs = xlib.ecs or {}
-log:assert(xlib.core.eventdispatcher, "xlib.core.eventdispatcher is nil")
-xlib.ecs.context = class(xlib.core.eventdispatcher)
+xlib.ecs.context = xlib.ecs.context or class(xlib.core.eventdispatcher)
 local context = xlib.ecs.context;
 
 function context:ctor()
-    self._object_pools = {}
-    self._entites = {}
-    self._collectors = {}
-    self._groups = {}
-    self._entity_class_matchers = {}
+    -- pool set,k:entity_class_type v:entity object pool
+    self._entity_pools = xlib.core.set.new();
+    -- entity array
+    self._entites = xlib.core.array.new();
+    -- groups set,k:matcher v:group
+    self._groups = xlib.core.set.new();
 end
 
-function context:_get_or_create_pool(entites_class)
-    local catch_pool = self._object_pools
-    local pool_class = xlib.core.object_pool
-    local pool_object_class = entites_class
-    local pool = table.get_or_create(catch_pool, pool_object_class, pool_class, pool_object_class);
-    return pool
-end
-
-function context:create_entity(entites_class)
-    entites_class = to_class(entites_class)
-    local pool = self:_get_or_create_pool(entites_class);
-    local entity = pool:get();
-    table.insert(self._entites, entity);
-    self:update_group(entity, xlib.ecs.group.event.on_entity_added)
-end
-
-function context:destroy_entity(entity)
-    local pool = self:_get_or_create_pool();
-    pool:put(entity);
-    self:update_group(entity, xlib.ecs.group.event.on_entity_removed);
+function context:_get_entity_pool(entites_type)
+    local entity_pools = self._entity_pools;
+    local pool_type = xlib.core.object_pool;
+    return entity_pools:get_value(entites_type) or entity_pools:set_value(entites_type, pool_type.new(entites_type))
 end
 
 function context:get_group(matcher)
-    local group = self._groups;
-    if group[matcher] == nil then
-        group[matcher] = xlib.ecs.group.new(matcher);
-        for _, entity in ipairs(self._entites) do
-            self:update_group(entity, xlib.ecs.group.event.on_entity_added);
-        end
+    matcher = to_class(matcher);
+    if matcher:is_instance() then
+        log:error("mather must a class type or model string");
     end
-    return group[matcher];
+
+    local groups = self._groups;
+    local group = groups:get_value(matcher) or groups:set_value(matcher, xlib.ecs.group.new(matcher));
+    local _self = self;
+
+    self._entites:foreach(function(entity)
+        group:update_entity(entity, xlib.ecs.group.event.on_entity_added);
+    end)
 end
 
-function context:get_group_for_entites_class(entites_class)
-    entites_class = to_class(entites_class);
-    local matcher = self._entity_class_matchers[entites_class];
-    if matcher == nil then
-        local matcher_class = to_class("xlib.ecs.matches.matcher_for_entity_class");
-        matcher = matcher_class.new(self._entites, entites_class);
-        self._entity_class_matchers[entites_class] = matcher;
-    end
-    return self:get_group(matcher);
-end
-
-function context:update_group(entity, group_event)
+function context:_update_group(entity, group_event)
     for _, group in pairs(self._groups) do
         group:update_entity(entity, group_event);
     end
 end
 
-function context:get_collector(group)
-    return self:get_collector_with_groups({group});
+function context:create_entity(entites_class)
+    entites_class = to_class(entites_class)
+    local pool = self:_get_entity_pool(entites_class);
+    local entity = pool:get();
+    self._entites:push(entity);
+    self:_update_group(entity, xlib.ecs.group.event.on_entity_added)
 end
 
-function context:get_collector_with_groups(groups)
-    local collectors = self._collectors;
-    local find = nil;
-    for _, collector in ipairs(collectors) do
-        if (collector == groups) then
-            return collector
-        end
-    end
-    return table.get_or_create(self._collectors, groups, xlib.ecs.collector, groups);
+function context:destroy_entity(entity)
+    local entity_type = entity:get_class();
+    local pool = self:_get_entity_pool(entity_type);
+    pool:put(entity);
+    self:_update_group(entity, xlib.ecs.group.event.on_entity_removed);
 end
 
 function context:has_entity(entity)
-    local pos, val = table.index_of(self._entites, entity)
-    return pos > 0
+    return self._entites:has(entity);
 end
 
-function context:get_entites()
-    return self._entites;
+function context:get_entites_array()
+    return self._entites
 end
-
--- function context:get_entites_group(entites_matcher)
---     local group = self._groups[entites_matcher]
---     if (group == nil) then
---         group = xlib.ecs.group.new(entites_matcher);
---     end
---     return group;
--- end
-
--- function context:get_group()
---     local matcher = nil
---     return self:get_entites_group(matcher);
--- end

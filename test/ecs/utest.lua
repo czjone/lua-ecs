@@ -7,46 +7,45 @@ end
 
 function utest:execute()
 
-    -- ------------------------------------------------------------
-    -- -- make component
-    -- do
-    --     local MakeComponent = require('entitas.MakeComponent')
-    --     local Position = MakeComponent("Position", "x", "y", "z")
-    --     local Movable = MakeComponent("Movable", "speed")
-    --     local Person = MakeComponent("Person", "name", "age")
-    -- end
+    local ret = true;
 
-    -- ------------------------------------------------------------
-    -- -- Entity
-    -- do
-    --     local entity = Entity.new()
+    ------------------------------------------------------------
+    -- make component
 
-    --     entity:activate(0)
-    --     entity:add(Position, 1, 4, 5)
-    --     assert(entity:has(Position))
-    --     assert(entity:has_any({Position}))
+    local position = xlib.ecs.make_component("position", "x", "y", "z")
+    local movable = xlib.ecs.make_component("movable", "speed")
+    local person = xlib.ecs.make_component("person", "name", "age")
 
-    --     local pos = entity:get(Position)
-    --     assert(pos.x == 1)
-    --     assert(pos.y == 4)
-    --     assert(pos.z == 5)
+    ------------------------------------------------------------
+    -- Entity
+    do
+        local entity = xlib.ecs.entity.new()
 
-    --     entity:replace(Position, 5, 6)
+        entity:activate()
+        entity:add(position, 1, 4, 5)
+        ret = ret and self.expect_true(entity:has(position), true, "entity:has");
+        ret = ret and self.expect_true(entity:has_any({position}), true, "entity:has_any");
 
-    --     entity:replace(Person, "wang")
+        local pos = entity:get(position)
+        ret = ret and self.expect(pos.x, 1, "entity get pos.x");
+        ret = ret and self.expect(pos.y, 4, "entity get pos.y");
+        ret = ret and self.expect(pos.z, 5, "entity get pos.z");
 
-    --     assert(entity:get(Position).x == 5)
-    --     assert(entity:get(Position).y == 6)
+        entity:replace(position, 5, 6)
+        entity:replace(person, "wang")
 
-    --     entity:remove(Position)
-    --     assert(not entity:has(Position))
+        ret = ret and self.expect(pos.x, 5, "entity get pos.x");
+        ret = ret and self.expect(pos.y, 6, "entity get pos.y");
 
-    --     entity:add(Position, 1, 4, 5)
-    --     entity:add(Movable, 0.56)
-    --     assert(entity:has_all({Position, Movable}))
-    --     entity:destroy()
-    --     assert(not entity:has_all({Position, Movable}))
-    -- end
+        entity:remove(position)
+        ret = ret and self.expect_false(entity:has(position), true, "entity:has");
+
+        entity:add(position, 1, 4, 5)
+        entity:add(movable, 0.56)
+        ret = ret and self.expect_true(entity:has_all({position, movable}), "entity:has_all")
+        entity:destroy()
+        ret = ret and self.expect_false(entity:has_all({position, movable}), "entity:has_all")
+    end
     -- ------------------------------------------------------------
     -- -- context
     -- do

@@ -13,10 +13,14 @@ function object_pool_handler:create_object()
     return self._class.new()
 end
 
-function object_pool_handler:rest_object(obj)
-
+function object_pool_handler:on_rest_object(obj)
+    if obj.rest then
+        obj:rest()
+    end
 end
 
-function object_pool_handler:reconvery_object(obj)
-
+function object_pool_handler:on_reconvery_object(obj)
+    if obj.reconvery then
+        obj:reconvery();
+    end
 end

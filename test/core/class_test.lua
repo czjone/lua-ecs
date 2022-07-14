@@ -55,11 +55,11 @@ function test:execute()
         c_instance:is_type_fast(c)
     end, "IS_TYPE:type is test fast.", allow_times_ms);
 
-    ret = self.test:expect_false(c_instance:is_destroy(), "c destroy status test") and ret
-    ret = self.test:expect_false(d_instance:is_destroy(), "c destroy status test") and ret
+    ret = self.test:expect_false(c_instance:is_destroy(), "c is destroy ?") and ret
+    ret = self.test:expect_false(d_instance:is_destroy(), "d is destroy ?") and ret
     c_instance:destroy();
-    ret = self.test:expect_true(c_instance:is_destroy(), "destroy status test") and ret
-    ret = self.test:expect_false(d_instance:is_destroy(), "destroy status test") and ret
+    ret = self.test:expect_true(c_instance:is_destroy(), "destroy c status test") and ret
+    ret = self.test:expect_false(d_instance:is_destroy(), "destroy d status test") and ret
     return ret
 end
 

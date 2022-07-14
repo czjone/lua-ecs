@@ -6,12 +6,19 @@ xlib.ecs.group = class(xlib.core.eventdispatcher)
 local group = xlib.ecs.group
 
 group.event = group.event or {}
+
 group.event.on_entity_added = 1
 group.event.on_entity_removed = 2
+group.event.on_will_destroy = 3
 
-function group:ctor(entites_matcher)
+function group:ctor(context, entites_matcher)
+    self._context = context
     self._matcher = entites_matcher
     self._catch_entites = {}
+end
+
+function group:destroy()
+
 end
 
 function group:has_entity(entity)
@@ -29,3 +36,4 @@ function group:update_entity(entity, group_event)
         table.remove_item(self._catch_entites, entity)
     end
 end
+

@@ -51,7 +51,7 @@ end
 function eventdispatcher:dispatch(key, ...)
     local events_array = self._event_set:get_value(key);
     if events_array then
-        local events = events_array:get_all();
+        local events = events_array:get_buf();
         for _, event in pairs(events) do
             event(...);
         end
@@ -59,5 +59,5 @@ function eventdispatcher:dispatch(key, ...)
 end
 
 function eventdispatcher:get_listeners()
-    return self._event_set:get_all();
+    return self._event_set
 end

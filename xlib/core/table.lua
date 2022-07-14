@@ -26,12 +26,3 @@ function table.remove_item(_table, val)
         table.remove(_table, pos);
     end
 end
-
-function table.get_or_create(_table, key, _class, ...)
-    local ret = _table[key];
-    if not ret then
-        ret = _class.new(...);
-        _table[key] = ret;
-    end
-    return ret;
-end

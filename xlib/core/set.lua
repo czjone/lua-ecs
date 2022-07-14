@@ -18,7 +18,7 @@ function set:insert(k, v)
     self._size = self._size + 1
 end
 
-function set:get_all()
+function set:get_buf()
     return self._data;
 end
 
@@ -27,6 +27,7 @@ function set:set_value(k, v)
         self._size = self._size + 1
     end
     self._data[k] = v;
+    return v;
 end
 
 function set:has(k)
@@ -35,6 +36,17 @@ end
 
 function set:get_value(k)
     return self._data[k];
+end
+
+function set:find_all(func)
+    local ret = {}
+    local d = self._data;
+    for k, v in pairs(d) do
+        if func(k, v) then
+            ret[k] = v;
+        end
+    end
+    return ret;
 end
 
 function set:remove(k)
