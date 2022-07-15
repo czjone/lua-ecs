@@ -5,18 +5,9 @@ xlib.ecs.context = xlib.ecs.context or class(xlib.core.eventdispatcher)
 local context = xlib.ecs.context;
 
 function context:ctor()
-    -- pool set,k:entity_class_type v:entity object pool
-    self._entity_pools = xlib.core.set.new();
-    -- entity array
+    self._entity_pools = xlib.core.object_pool.new(xlib.ecs.entity);
     self._entites = xlib.core.array.new();
-    -- groups set,k:matcher v:group
     self._groups = xlib.core.set.new();
-end
-
-function context:_get_entity_pool(entites_type)
-    local entity_pools = self._entity_pools;
-    local pool_type = xlib.core.object_pool;
-    return entity_pools:get_value(entites_type) or entity_pools:set_value(entites_type, pool_type.new(entites_type))
 end
 
 function context:get_group(matcher)
@@ -34,25 +25,16 @@ function context:get_group(matcher)
     end)
 end
 
-function context:_update_group(entity, group_event)
-    for _, group in pairs(self._groups) do
-        group:update_entity(entity, group_event);
-    end
-end
-
-function context:create_entity(entites_class)
-    entites_class = to_class(entites_class)
-    local pool = self:_get_entity_pool(entites_class);
-    local entity = pool:get();
+function context:create_entity()
+    local entity = self._entity_pools:get();
     self._entites:push(entity);
-    self:_update_group(entity, xlib.ecs.group.event.on_entity_added)
+    return entity;
 end
 
 function context:destroy_entity(entity)
     local entity_type = entity:get_class();
-    local pool = self:_get_entity_pool(entity_type);
-    pool:put(entity);
-    self:_update_group(entity, xlib.ecs.group.event.on_entity_removed);
+    self._entites:remove(entity);
+    self._entity_pools:put(entity);
 end
 
 function context:has_entity(entity)
@@ -61,4 +43,20 @@ end
 
 function context:get_entites_array()
     return self._entites
+end
+
+function context:set_unique_component(com_type, ...)
+    local entity = self:create_entity();
+    entity:add(com_type, ...)
+    return entity;
+end
+
+function context:get_unique_component(com_type)
+    local group = self:get_group()
+    local entity = group:single_entity();
+    return entity:get(com_type)
+end
+
+function context:entity_size()
+    return self._entites:size();
 end

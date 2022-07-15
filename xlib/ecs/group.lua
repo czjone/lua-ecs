@@ -29,6 +29,10 @@ function group:get_entites()
     return self._catch_entites;
 end
 
+function group:single_entity()
+    
+end
+
 function group:update_entity(entity, group_event)
     if (self._matcher:match(entity)) and group_event == group.event.on_entity_added then
         table.insert(self._catch_entites, entity);

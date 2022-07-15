@@ -11,194 +11,230 @@ function utest:execute()
 
     ------------------------------------------------------------
     -- make component
-
-    local position = xlib.ecs.make_component("position", "x", "y", "z")
-    local movable = xlib.ecs.make_component("movable", "speed")
-    local person = xlib.ecs.make_component("person", "name", "age")
+    local make_component = xlib.ecs.component.make
+    local position = make_component({"w", "x", "y", "z"})
+    local movable = make_component({"speed"})
+    local person = make_component({"name", "age"})
 
     ------------------------------------------------------------
-    -- Entity
+    -- entity
     do
         local entity = xlib.ecs.entity.new()
+        local make_value = xlib.ecs.component.make_value
 
         entity:activate()
-        entity:add(position, 1, 4, 5)
-        ret = ret and self.expect_true(entity:has(position), true, "entity:has");
-        ret = ret and self.expect_true(entity:has_any({position}), true, "entity:has_any");
+        entity:add(position, nil, 1, 4, 5)
+        ret = ret and self.test:expect_true(entity:has(position), "entity:has");
+        ret = ret and self.test:expect_true(entity:has_any(position, person), "entity:has_any");
 
         local pos = entity:get(position)
-        ret = ret and self.expect(pos.x, 1, "entity get pos.x");
-        ret = ret and self.expect(pos.y, 4, "entity get pos.y");
-        ret = ret and self.expect(pos.z, 5, "entity get pos.z");
+        ret = ret and self.test:expect(pos.x, 1, "entity get pos.x");
+        ret = ret and self.test:expect(pos.y, 4, "entity get pos.y");
+        ret = ret and self.test:expect(pos.z, 5, "entity get pos.z");
 
-        entity:replace(position, 5, 6)
-        entity:replace(person, "wang")
+        entity:add(person, {
+            name = "solyess",
+            age = 18
+        })
 
-        ret = ret and self.expect(pos.x, 5, "entity get pos.x");
-        ret = ret and self.expect(pos.y, 6, "entity get pos.y");
+        local p = entity:get(person)
+        ret = ret and self.test:expect(p.name, "solyess", "entity get p.name");
+        ret = ret and self.test:expect(p.age, 18, "entity get p.age");
+
+        entity:replace(position, nil, 5, 6)
+        entity:replace(person, {
+            name = "wang"
+        })
+
+        ret = ret and self.test:expect(pos.x, 5, "entity get person.x  affer replace dynamic parameter");
+        ret = ret and self.test:expect(pos.y, 6, "entity get person.y  affer replace dynamic parameter");
+        ret = ret and self.test:expect(p.name, "wang", "entity get person.name affer replace with table");
+        ret = ret and self.test:expect(p.age, 18, "entity get person.age affer replace with table");
 
         entity:remove(position)
-        ret = ret and self.expect_false(entity:has(position), true, "entity:has");
+        ret = ret and self.test:expect_false(entity:has(position), true, "entity:has after remove");
 
-        entity:add(position, 1, 4, 5)
+        entity:add(position)
         entity:add(movable, 0.56)
-        ret = ret and self.expect_true(entity:has_all({position, movable}), "entity:has_all")
-        entity:destroy()
-        ret = ret and self.expect_false(entity:has_all({position, movable}), "entity:has_all")
+        ret = ret and self.test:expect_true(entity:has_all(position, movable), "entity:has_all")
+        entity:remove(position)
+        ret = ret and self.test:expect_false(entity:has_all(position, movable), "entity:has_all")
+        ret = ret and self.test:expect_true(entity:has_any(position, movable), "entity:has_all")
+        entity:remove(movable)
+        ret = ret and self.test:expect_false(entity:has_any(position, movable), "entity:has_all")
     end
     -- ------------------------------------------------------------
     -- -- context
-    -- do
-    --     local _context = Context.new()
-    --     local _entity = _context:create_entity()
+    do
+        local _context = xlib.ecs.context.new()
 
-    --     assert(Context.create_entity)
-    --     assert(Context.has_entity)
-    --     assert(Context.destroy_entity)
-    --     assert(Context.get_group)
-    --     assert(Context.set_unique_component)
-    --     assert(Context.get_unique_component)
+        ret = ret and self.test:has_api(_context.create_entity, "check api:_context.create_entity")
+        ret = ret and self.test:has_api(_context.has_entity, "check api:_context.has_entity")
+        ret = ret and self.test:has_api(_context.destroy_entity, "check api:_context.destroy_entity")
+        ret = ret and self.test:has_api(_context.get_group, "check api:_context.get_group")
+        ret = ret and self.test:has_api(_context.set_unique_component, "check api:_context.set_unique_component")
+        ret = ret and self.test:has_api(_context.get_unique_component, "check api:_context.get_unique_component")
+        ret = ret and self.test:has_api(_context.entity_size, "check api:_context.entity_size")
 
-    --     assert(_context:has_entity(_entity))
-    --     lu.assertEquals(_context:entity_size(), 1)
-    --     _context:destroy_entity(_entity)
-    --     assert(not _context:has_entity(_entity))
+        local _entity = _context:create_entity()
 
-    --     -- reuse
-    --     local _e2 = _context:create_entity()
-    --     assert(_context:has_entity(_entity))
-    --     lu.assertEquals(_context:entity_size(), 1)
+        ret = ret and self.test:expect_true(_context:has_entity(_entity), "_context has entity")
+        ret = ret and self.test:expect(_context:entity_size(), 1, "_context entity_size")
 
-    --     _context:set_unique_component(Counter, 101)
-    --     local cmp = _context:get_unique_component(Counter)
-    --     assert(cmp.num == 101)
-    -- end
-    -- ------------------------------------------------------------
-    -- -- group
-    -- do
-    --     local _context = Context.new()
-    --     local _entity = _context:create_entity()
+        _context:destroy_entity(_entity)
+        ret = ret and self.test:expect_false(_context:has_entity(_entity), "_context destroy entity")
 
-    --     _entity:add(Movable, 1)
+        -- re use
+        local _e2 = _context:create_entity()
+        ret = ret and self.test:expect_true(_context:has_entity(_entity), "_context has entity")
+        ret = ret and self.test:expect(_context:entity_size(), 1, "_context entity_size")
 
-    --     local _group = _context:get_group(Matcher({Movable}))
-    --     local _group2 = _context:get_group(Matcher({Movable}))
-    --     assert(_group == _group2)
+        -- local player = make_component({"id", "token", "nice_name"})
 
-    --     assert(_group.entities:size() == 1)
-    --     assert(_group:single_entity():has(Movable))
+        -- _context:set_unique_component(player, {
+        --     id = 101,
+        --     token = "134ec41edf7c1d3de31dfe78cd134ec41edf7c1d3de31dfe78cd",
+        --     nice_name = "player01"
+        -- })
+        -- local com = _context:get_unique_component(player)
+        -- ret = ret and self.test:expect(com.id, 101, "_context get_unique_component")
+        -- _context:destroy_entity(com)
+        -- ret = ret and self.test:expect_false(_context:has_entity(player), "_context destroy")
+    end
+    ------------------------------------------------------------
+    -- group
+    local matcher = xlib.ecs.matcher
+    do
+        local _context = xlib.ecs.context.new()
+        local _entity = _context:create_entity()
 
-    --     assert(_group:single_entity() == _entity)
-    --     _entity:replace(Movable, 2)
-    --     assert(_group:single_entity() == _entity)
-    --     _entity:remove(Movable)
-    --     assert(not _group:single_entity())
+        _entity:add(movable, 1)
 
-    --     _entity:add(Movable, 3)
+        local _matcher1 = matcher.new({movable})
+        local _matcher2 = matcher.new({movable})
 
-    --     local _entity2 = _context:create_entity()
-    --     _entity2:add(Movable, 10)
-    --     lu.assertEquals(_group.entities:size(), 2)
-    --     local entities = _group.entities
+        local _group = _context:get_group(_matcher1)
+        local _group2 = _context:get_group(_matcher2)
 
-    --     assert(entities:has(_entity))
-    --     assert(entities:has(_entity2))
-    -- end
-    -- ------------------------------------------------------------
-    -- -- Entity Collector
-    -- do
-    --     local context = Context.new()
-    --     local group = context:get_group(Matcher({Position}))
-    --     local pair = {}
-    --     pair[group] = GroupEvent.ADDED | GroupEvent.REMOVED
-    --     local collector = Collector.new(pair)
-    --     local _entity = context:create_entity()
-    --     _entity:add(Position, 1, 2, 3)
-    --     lu.assertEquals(collector.entities:size(), 1)
-    --     context:destroy_entity(_entity)
-    --     lu.assertEquals(collector.entities:size(), 0)
-    --     collector:clear_entities()
-    --     collector:deactivate()
-    -- end
+        ret = ret and self.test:expect_true(_group == _group2, "group match result comparison")
+        ret = ret and self.test:expect(_group.entities:size(), 1, "group match entites size")
+        ret = ret and self.test:expect_true(_group:single_entity():has(movable), 1, "group match single_entity has")
+        ret = ret and self.test:expect(_group:single_entity(), _entity, "group single_entity")
 
-    -- ------------------------------------------------------------
-    -- --  Entity Index
-    -- do
-    --     local context = Context.new()
-    --     local group = context:get_group(Matcher({Person}))
-    --     local index = EntityIndex.new(Person, group, 'age')
-    --     context:add_entity_index(index)
-    --     local adam = context:create_entity()
-    --     adam:add(Person, 'Adam', 42)
-    --     local eve = context:create_entity()
-    --     eve:add(Person, 'Eve', 42)
+        _entity:replace(movable, 2)
+        ret = ret and self.test:expect(_group:single_entity(), _entity, "group replace single_entity")
 
-    --     local idx = context:get_entity_index(Person)
-    --     local entities = idx:get_entities(42)
+        _entity:remove(movable)
+        ret = ret and self.test:expect(_group:single_entity(), _entity, "group remove single_entity")
 
-    --     assert(entities:has(adam))
-    --     assert(entities:has(eve))
-    -- end
-    -- ------------------------------------------------------------
-    -- --  example
-    -- -------------------------------------------
-    -- do
-    --     local StartGame = class("StartGame")
-    --     function StartGame:ctor(context)
-    --         self.context = context
-    --     end
+        _entity:add(movable, 3)
 
-    --     function StartGame:initialize()
-    --         print("StartGame initialize")
-    --         local entity = self.context:create_entity()
-    --         entity:add(Movable, 123)
-    --     end
+        local _entity2 = _context:create_entity()
+        _entity2:add(movable, 10)
 
-    --     -------------------------------------------
-    --     local EndSystem = class("EndSystem")
-    --     function EndSystem:ctor(context)
-    --         self.context = context
-    --     end
+        ret = ret and self.test:expect(_group.entities:size(), 2, "group match entites size")
+        local entities = _group.entities
 
-    --     function EndSystem:tear_down()
-    --         print("EndSystem tear_down")
-    --     end
+        ret = ret and self.test:expect_true(entities:has(_entity), "group has entity")
+        ret = ret and self.test:expect_true(entities:has(_entity2), "group has entity")
+    end
+    ------------------------------------------------------------
+    -- entity collector
+    do
+        local context = context.new()
+        local collector = xlib.ecs.collector
+        local group = context:get_group(matcher({position}))
+        local pair = {}
+        pair[group] = group.event.added | group.event.remove
+        local collector = collector.new(pair)
+        local _entity = context:create_entity()
+        _entity:add(position, 1, 2, 3)
+        lu.assertEquals(collector.entities:size(), 1)
+        context:destroy_entity(_entity)
+        lu.assertEquals(collector.entities:size(), 0)
+        collector:clear_entities()
+        collector:deactivate()
+    end
 
-    --     -------------------------------------------
-    --     local MoveSystem = class("MoveSystem", ReactiveSystem)
+    ------------------------------------------------------------
+    --  etity index
+    do
+        local context = Context.new()
+        local group = context:get_group(Matcher({Person}))
+        local index = EntityIndex.new(Person, group, 'age')
+        context:add_entity_index(index)
+        local adam = context:create_entity()
+        adam:add(Person, 'Adam', 42)
+        local eve = context:create_entity()
+        eve:add(Person, 'Eve', 42)
 
-    --     function MoveSystem:ctor(context)
-    --         MoveSystem.super.ctor(self, context)
-    --     end
+        local idx = context:get_entity_index(Person)
+        local entities = idx:get_entities(42)
 
-    --     local trigger = {{Matcher({Movable}), GroupEvent.ADDED | GroupEvent.UPDATE}}
+        assert(entities:has(adam))
+        assert(entities:has(eve))
+    end
 
-    --     function MoveSystem:get_trigger()
-    --         return trigger
-    --     end
+    ------------------------------------------------------------
+    --  example
+    -------------------------------------------
+    do
+        local StartGame = class("StartGame")
+        function StartGame:ctor(context)
+            self.context = context
+        end
 
-    --     function MoveSystem:filter(entity)
-    --         return entity:has(Movable)
-    --     end
+        function StartGame:initialize()
+            print("StartGame initialize")
+            local entity = self.context:create_entity()
+            entity:add(Movable, 123)
+        end
 
-    --     function MoveSystem:execute(es)
-    --         es:foreach(function(e)
-    --             print("ReactiveSystem: add entity with component Movable.", e)
-    --         end)
-    --     end
+        -------------------------------------------
+        local EndSystem = class("EndSystem")
+        function EndSystem:ctor(context)
+            self.context = context
+        end
 
-    --     local _context = Context.new()
-    --     local systems = Systems.new()
-    --     systems:add(StartGame.new(_context))
-    --     systems:add(MoveSystem.new(_context))
-    --     systems:add(EndSystem.new(_context))
+        function EndSystem:tear_down()
+            print("EndSystem tear_down")
+        end
 
-    --     systems:initialize()
+        -------------------------------------------
+        local MoveSystem = class("MoveSystem", ReactiveSystem)
 
-    --     systems:execute()
+        function MoveSystem:ctor(context)
+            MoveSystem.super.ctor(self, context)
+        end
 
-    --     systems:tear_down()
-    -- end
+        local trigger = {{Matcher({Movable}), GroupEvent.ADDED | GroupEvent.UPDATE}}
+
+        function MoveSystem:get_trigger()
+            return trigger
+        end
+
+        function MoveSystem:filter(entity)
+            return entity:has(Movable)
+        end
+
+        function MoveSystem:execute(es)
+            es:foreach(function(e)
+                print("ReactiveSystem: add entity with component Movable.", e)
+            end)
+        end
+
+        local _context = Context.new()
+        local systems = Systems.new()
+        systems:add(StartGame.new(_context))
+        systems:add(MoveSystem.new(_context))
+        systems:add(EndSystem.new(_context))
+
+        systems:initialize()
+
+        systems:execute()
+
+        systems:tear_down()
+    end
 
     return true;
 end

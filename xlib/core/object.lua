@@ -49,13 +49,13 @@ function is_type_fast(_self, __class)
     return _self.__class_type == __class
 end
 --- func get_class
-function get_class(_self, __class)
+function get_class(_self)
     return _self.__class_type;
 end
 
 --- func 
 function is_instance(_self)
-    return self:get_class();
+    return _self:get_class();
 end
 
 function destroy(_self)
@@ -122,14 +122,17 @@ function class(super)
         return obj
     end
 
-    if super then
-        setmetatable(class_type, {
-            __index = function(t, k)
-                local ret = super[k]
-                return ret
-            end
-        })
-    end
+    setmetatable(class_type, {
+        __index = function(t, k)
+            local ret = super[k]
+            return ret
+        end,
+        -- BUG
+        -- __call = function(...)
+        --     return class_type.new(...)
+        -- end
+    })
+
     return class_type
 end
 

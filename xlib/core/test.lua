@@ -41,6 +41,16 @@ function test:expect(out_val, tag_val, des)
     end
 end
 
+function test:has_api(api, des)
+    if (api == nil) then
+        self:_show_fail(des, " api not exist")
+        return false
+    else
+        log:ok("test", des)
+        return true
+    end
+end
+
 function test:expect_true(out_val, des)
     return self:expect(out_val, true, des)
 end

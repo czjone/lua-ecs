@@ -18,5 +18,3 @@ require("xlib.ecs.system")
 require("xlib.ecs.reactive_system")
 require("xlib.ecs.feature")
 require("xlib.ecs.world")
--- default matchers.
-require("xlib.ecs.matches.matcher_for_entity_class")

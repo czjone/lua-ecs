@@ -12,7 +12,7 @@ end
 
 function test:execute()
 
-    local loop, create_class_loop, allow_times_ms = 1000000, 50000, 200
+    local loop, create_class_loop, allow_times_ms = 10000, 10000, 200
 
     local expect_val = self.expect_val;
     local c = self.c
