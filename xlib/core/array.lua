@@ -1,8 +1,8 @@
 xlib.core.array = xlib.core.array or class()
 local array = xlib.core.array
 
-function array:ctor()
-    self._data = {}
+function array:ctor(array_buff)
+    self._data = array_buff or {}
 end
 
 function array:size()

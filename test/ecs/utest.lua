@@ -63,6 +63,7 @@ function utest:execute()
         entity:remove(movable)
         ret = ret and self.test:expect_false(entity:has_any(position, movable), "entity:has_all")
     end
+
     -- ------------------------------------------------------------
     -- -- context
     do
@@ -89,50 +90,66 @@ function utest:execute()
         ret = ret and self.test:expect_true(_context:has_entity(_entity), "_context has entity")
         ret = ret and self.test:expect(_context:entity_size(), 1, "_context entity_size")
 
-        -- local player = make_component({"id", "token", "nice_name"})
+        local player = make_component({"id", "token", "nice_name"})
 
-        -- _context:set_unique_component(player, {
-        --     id = 101,
-        --     token = "134ec41edf7c1d3de31dfe78cd134ec41edf7c1d3de31dfe78cd",
-        --     nice_name = "player01"
-        -- })
-        -- local com = _context:get_unique_component(player)
-        -- ret = ret and self.test:expect(com.id, 101, "_context get_unique_component")
-        -- _context:destroy_entity(com)
-        -- ret = ret and self.test:expect_false(_context:has_entity(player), "_context destroy")
+        _context:set_unique_component(player, {
+            id = 101,
+            token = "134ec41edf7c1d3de31dfe78cd134ec41edf7c1d3de31dfe78cd",
+            nice_name = "player01"
+        })
+        local com = _context:get_unique_component(player)
+        ret = ret and self.test:expect(com.id, 101, "_context get_unique_component")
+        _context:destroy_entity(com)
+        ret = ret and self.test:expect_false(_context:has_entity(player), "_context destroy")
     end
+
+    -------------------------------------------
+    -- matcher
+    local matcher = xlib.ecs.matcher
+    do
+        local matcher_a = matcher.new(position);
+        local matcher_b = matcher.new(position);
+        local matcher_c = matcher.new(movable);
+        local matcher_d = matcher.new(movable, position);
+
+        ret = ret and self.test:expect_true(matcher_a == matcher_b, "matcher a == b")
+        ret = ret and self.test:expect_false(matcher_a == matcher_c, "matcher a ~= c")
+        ret = ret and self.test:expect_false(matcher_a == matcher_d, "matcher a ~= d")
+    end
+
     ------------------------------------------------------------
     -- group
-    local matcher = xlib.ecs.matcher
+
     do
         local _context = xlib.ecs.context.new()
         local _entity = _context:create_entity()
 
         _entity:add(movable, 1)
 
-        local _matcher1 = matcher.new({movable})
-        local _matcher2 = matcher.new({movable})
+        local _matcher1 = matcher.new(movable)
+        local _matcher2 = matcher.new(movable)
+        local _matcher3 = matcher.new(movable, position)
 
         local _group = _context:get_group(_matcher1)
         local _group2 = _context:get_group(_matcher2)
 
         ret = ret and self.test:expect_true(_group == _group2, "group match result comparison")
-        ret = ret and self.test:expect(_group.entities:size(), 1, "group match entites size")
-        ret = ret and self.test:expect_true(_group:single_entity():has(movable), 1, "group match single_entity has")
-        ret = ret and self.test:expect(_group:single_entity(), _entity, "group single_entity")
+        ret = ret and self.test:expect(_group:get_entites():size(), 1, "group match entites size")
+        ret = ret and self.test:expect_true(_group:get_single_entity():has(movable), 1, "group match single_entity has")
+        ret = ret and self.test:expect(_group:get_single_entity(), _entity, "group single_entity")
 
         _entity:replace(movable, 2)
-        ret = ret and self.test:expect(_group:single_entity(), _entity, "group replace single_entity")
+        ret = ret and self.test:expect(_group:get_single_entity(), _entity, "group replace single_entity")
 
         _entity:remove(movable)
-        ret = ret and self.test:expect(_group:single_entity(), _entity, "group remove single_entity")
+        ret = ret and self.test:expect(_group:get_single_entity(), _entity, "group remove single_entity")
 
         _entity:add(movable, 3)
 
         local _entity2 = _context:create_entity()
         _entity2:add(movable, 10)
 
-        ret = ret and self.test:expect(_group.entities:size(), 2, "group match entites size")
+        ret = ret and self.test:expect(_group:get_entites():size(), 2, "group match entites size")
         local entities = _group.entities
 
         ret = ret and self.test:expect_true(entities:has(_entity), "group has entity")

@@ -80,3 +80,7 @@ function entity:activate()
     self._enable = true;
 end
 
+function entity:deactivate()
+    self._enable = nil;
+end
+

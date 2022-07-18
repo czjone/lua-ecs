@@ -11,13 +11,20 @@ group.event.on_entity_added = 1
 group.event.on_entity_removed = 2
 group.event.on_will_destroy = 3
 
-function group:ctor(context, entites_matcher)
-    self._context = context
+function group:ctor(entites_matcher)
     self._matcher = entites_matcher
-    self._catch_entites = {}
+    self._catch_entites = xlib.core.array.new();
+    local metatable = getmetatable(self)
+    metatable.__eq = function(a, b)
+        return a._matcher == b._matcher
+    end
 end
 
 function group:destroy()
+
+end
+
+function group:is_matcher(entites_matcher)
 
 end
 
@@ -29,15 +36,15 @@ function group:get_entites()
     return self._catch_entites;
 end
 
-function group:single_entity()
+function group:get_single_entity()
     
 end
 
-function group:update_entity(entity, group_event)
-    if (self._matcher:match(entity)) and group_event == group.event.on_entity_added then
-        table.insert(self._catch_entites, entity);
+function group:update_entity(entity, event)
+    if event == group.event.on_entity_added and self._matcher:match(entity) then
+        self._catch_entites:push(entity)
     else
-        table.remove_item(self._catch_entites, entity)
+        self._catch_entites:remove(entity)
     end
 end
 
