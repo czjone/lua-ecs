@@ -37,7 +37,11 @@ function group:get_entites()
 end
 
 function group:get_single_entity()
-    
+    if (self._catch_entites:size() == 1) then
+        return self._catch_entites:get(1)
+    else
+        return nil;
+    end
 end
 
 function group:update_entity(entity, event)

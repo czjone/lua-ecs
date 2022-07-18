@@ -8,6 +8,14 @@ function context:ctor()
     self._entity_pools = xlib.core.object_pool.new(xlib.ecs.entity);
     self._entites = xlib.core.array.new();
     self._groups = xlib.core.array.new();
+    self._matchers = xlib.core.set.new();
+end
+
+function context:get_matcher(com_type)
+    if not self._matchers:has(com_type) then
+        self._matchers:set_value(com_type, xlib.ecs.matcher.new(com_types));
+    end
+    return self._matchers:get_value(com_type);
 end
 
 function context:get_group(...)
@@ -65,8 +73,12 @@ function context:set_unique_component(com_type, ...)
 end
 
 function context:get_unique_component(com_type)
-    local group = self:get_group()
-    local entity = group:single_entity();
+    local matcher = self:get_matcher(com_type)
+    local group = self:get_group(matcher)
+    local entity = group:get_single_entity();
+    if not entity then
+        return nil
+    end
     return entity:get(com_type)
 end
 

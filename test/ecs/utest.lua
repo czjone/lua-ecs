@@ -95,7 +95,7 @@ function utest:execute()
         _context:set_unique_component(player, {
             id = 101,
             token = "134ec41edf7c1d3de31dfe78cd134ec41edf7c1d3de31dfe78cd",
-            nice_name = "player01"
+            nice_name = "red car"
         })
         local com = _context:get_unique_component(player)
         ret = ret and self.test:expect(com.id, 101, "_context get_unique_component")
@@ -176,7 +176,7 @@ function utest:execute()
     ------------------------------------------------------------
     --  etity index
     do
-        local context = Context.new()
+        local context = context.new()
         local group = context:get_group(Matcher({Person}))
         local index = EntityIndex.new(Person, group, 'age')
         context:add_entity_index(index)
