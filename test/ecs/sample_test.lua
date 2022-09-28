@@ -1,4 +1,4 @@
-﻿local sample = class(xlib.core.test_base)
+local sample = class(xlib.core.test_base)
 
 function sample:ctor(test)
     self._test = test
