@@ -1,4 +1,4 @@
-﻿local utest = class(xlib.core.test_base)
+local utest = class(xlib.core.test_base)
 
 function utest:ctor(test)
     self._test = test
